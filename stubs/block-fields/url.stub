@@ -1,0 +1,3 @@
+    @if (filled($data['[[name]]'] ?? null))
+        <a href="{{ $data['[[name]]'] }}">[[label]]</a>
+    @endif

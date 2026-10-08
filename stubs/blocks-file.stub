@@ -1,0 +1,19 @@
+<?php
+
+declare(strict_types=1);
+
+/*
+|------------------------------------------------------------------------------
+| The site's own blocks
+|------------------------------------------------------------------------------
+|
+| Alongside the built-in ones. `php artisan cms:block` adds to this file; edit
+| freely. Each block renders resources/views/vendor/cgcms/blocks/<handle>.blade.php
+| with its values in $data and its rendered rich text in $html.
+|
+*/
+
+use Cg\Cms\Schema\Block;
+use Cg\Cms\Schema\Field;
+
+return [

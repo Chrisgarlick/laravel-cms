@@ -1,0 +1,3 @@
+    @if (filled($data['[[name]]'] ?? null))
+        <p>{{ $data['[[name]]'] }}</p>
+    @endif

@@ -1,0 +1,40 @@
+{
+    "name": "cg-cms-admin",
+    "private": true,
+    "type": "module",
+    "description": "Admin bundle for chrisgarlick/cg-cms. Built here, committed to dist/, never built on a server.",
+    "scripts": {
+        "dev": "vite --config vite.admin.config.ts",
+        "build": "vite build --config vite.admin.config.ts",
+        "check": "tsc --noEmit",
+        "smoke": "node --experimental-strip-types scripts/smoke-editor.mjs",
+        "verify": "npm run check && npm run smoke && npm run build"
+    },
+    "dependencies": {
+        "@dnd-kit/core": "^6.3.1",
+        "@dnd-kit/modifiers": "^9.0.0",
+        "@dnd-kit/sortable": "^10.0.0",
+        "@dnd-kit/utilities": "^3.2.2",
+        "@fontsource-variable/geist": "^5.3.0",
+        "@fontsource-variable/geist-mono": "^5.3.0",
+        "@inertiajs/react": "^2.0.0",
+        "@tailwindcss/vite": "^4.3.3",
+        "@tiptap/react": "^3.31.3",
+        "@tiptap/starter-kit": "^3.31.3",
+        "cmdk": "^1.1.1",
+        "lucide-react": "^1.52.0",
+        "radix-ui": "^1.6.7",
+        "react": "^19.0.0",
+        "react-dom": "^19.0.0",
+        "tailwindcss": "^4.3.3"
+    },
+    "devDependencies": {
+        "@types/node": "^26.6.2",
+        "@types/react": "^19.0.0",
+        "@types/react-dom": "^19.0.0",
+        "@vitejs/plugin-react": "^5.0.0",
+        "jsdom": "^29.1.1",
+        "typescript": "^5.7.0",
+        "vite": "^8.0.0"
+    }
+}

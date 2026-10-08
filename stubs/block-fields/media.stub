@@ -1,0 +1,1 @@
+    <x-cms-image :value="$data['[[name]]'] ?? null" preset="card" />

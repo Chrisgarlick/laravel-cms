@@ -1,0 +1,3 @@
+        @if (filled($entry->value('[[name]]')))
+            <p>{{ $entry->value('[[name]]') }}</p>
+        @endif

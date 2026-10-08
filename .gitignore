@@ -1,0 +1,20 @@
+/vendor
+/composer.lock
+.phpunit.result.cache
+/build
+.DS_Store
+/node_modules
+
+# dist/ is deliberately NOT ignored.
+#
+# The built admin bundle is committed so that installing this package needs no
+# Node at all: composer require, vendor:publish, done. On a 1 vCPU / 1GB box
+# that is not a convenience, it is the difference between deploying and running
+# out of memory partway through a Vite build.
+#
+# The cost is noisy diffs and a discipline requirement to rebuild before
+# tagging. `php artisan cms:admin-assets --check` fails when dist/ is older
+# than resources/js, so CI can enforce it rather than trusting memory.
+#
+# The dev server's hot file is a local artefact and is never committed.
+/dist/hot

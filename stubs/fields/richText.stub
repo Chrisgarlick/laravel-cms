@@ -1,0 +1,3 @@
+        @if ($entry->html('[[name]]') !== '')
+            <div>{!! $entry->html('[[name]]') !!}</div>
+        @endif

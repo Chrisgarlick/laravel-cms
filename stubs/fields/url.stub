@@ -1,0 +1,3 @@
+        @if (filled($entry->value('[[name]]')))
+            <p><a href="{{ $entry->value('[[name]]') }}" rel="noopener">[[label]]</a></p>
+        @endif

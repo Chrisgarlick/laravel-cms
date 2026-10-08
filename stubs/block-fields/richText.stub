@@ -1,0 +1,3 @@
+    @if (filled($html['[[name]]'] ?? null))
+        <div>{!! $html['[[name]]'] !!}</div>
+    @endif
