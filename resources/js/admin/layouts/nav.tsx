@@ -1,4 +1,4 @@
-import { ArrowRightLeft, BookOpen, Boxes, ListChecks, Briefcase, ChartColumn, FileText, Gauge, Image, Inbox, Layers, Library, Settings, Tag, Wrench, type LucideIcon } from 'lucide-react'
+import { ArrowRightLeft, BookOpen, Boxes, ListChecks, ShieldCheck, Briefcase, ChartColumn, FileText, Gauge, Image, Inbox, Layers, Library, Settings, Tag, Wrench, type LucideIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
 import type { SharedProps } from '@/types'
 
@@ -51,6 +51,7 @@ export function navGroups(cms: SharedProps['cms'], nav: SharedProps['nav']): Arr
                     count: nav ? nav.queue.pending + nav.queue.failed || undefined : undefined,
                     attention: Boolean(nav && (nav.queue.failed > 0 || nav.queue.stalled)),
                 },
+                { href: `${cms.prefix}/security`, label: 'Security', icon: <ShieldCheck />, count: nav?.security || undefined, attention: (nav?.security ?? 0) > 0 },
                 { href: `${cms.prefix}/schema`, label: 'Content model', icon: <Boxes /> },
                 { href: `${cms.prefix}/settings`, label: 'Settings', icon: <Settings /> },
             ],

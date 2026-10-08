@@ -8,6 +8,7 @@ use Cg\Cms\Models\Entry;
 use Cg\Cms\Models\FormSubmission;
 use Cg\Cms\Models\Media;
 use Cg\Cms\Models\SeoIssue;
+use Cg\Cms\Security\DependencyAudit;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -23,7 +24,7 @@ use Illuminate\Support\Facades\DB;
 final class NavCounts
 {
     /**
-     * @return array{collections: array<string, array{total: int, drafts: int}>, leads: int, leadsAttention: bool, seoBlocking: int, queue: array{pending: int, failed: int, stalled: bool}, mediaMissingAlt: int}
+     * @return array{collections: array<string, array{total: int, drafts: int}>, leads: int, leadsAttention: bool, seoBlocking: int, queue: array{pending: int, failed: int, stalled: bool}, mediaMissingAlt: int, security: int}
      */
     public function all(): array
     {
@@ -60,6 +61,9 @@ final class NavCounts
             'seoBlocking' => SeoIssue::query()->where('severity', 'block')->count(),
 
             'queue' => $this->queue(),
+
+            // Advisories against production dependencies, from the last check.
+            'security' => app(DependencyAudit::class)->productionCount(),
 
             'mediaMissingAlt' => Media::query()
                 ->where(fn ($query) => $query->whereNull('alt')->orWhere('alt', ''))

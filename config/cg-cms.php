@@ -239,6 +239,22 @@ return [
     ],
 
     /*
+    |--------------------------------------------------------------------------
+    | Security
+    |--------------------------------------------------------------------------
+    |
+    | cms:security-audit checks composer.lock and package-lock.json against
+    | the Packagist and npm advisory databases for the admin's Security
+    | screen. It reports only; it never updates anything.
+    |
+    */
+
+    'security' => [
+        // When it runs, as cron. Null leaves it to the host app.
+        'schedule' => env('CG_SECURITY_AUDIT_SCHEDULE', '45 3 * * *'),
+    ],
+
+    /*
     |---------------------------------------------------------------------------
     | Page cache
     |---------------------------------------------------------------------------

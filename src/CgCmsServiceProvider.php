@@ -21,6 +21,7 @@ use Cg\Cms\Console\FlushCacheCommand;
 use Cg\Cms\Console\MakeBlockCommand;
 use Cg\Cms\Console\MakeCollectionCommand;
 use Cg\Cms\Console\PruneCacheCommand;
+use Cg\Cms\Console\SecurityAuditCommand;
 use Cg\Cms\Console\SeoAuditCommand;
 use Cg\Cms\Console\SeoFilesCommand;
 use Cg\Cms\Console\SyncSchemaCommand;
@@ -395,6 +396,7 @@ final class CgCmsServiceProvider extends ServiceProvider
                 PruneCacheCommand::class,
                 AdminAssetsCommand::class,
                 SeoAuditCommand::class,
+                SecurityAuditCommand::class,
                 MakeCollectionCommand::class,
                 MakeBlockCommand::class,
                 Content\CollectionsCommand::class,
@@ -417,6 +419,18 @@ final class CgCmsServiceProvider extends ServiceProvider
             $this->callAfterResolving(Schedule::class, function (Schedule $scheduler) use ($schedule): void {
                 $scheduler->command(SeoAuditCommand::class)
                     ->cron($schedule)
+                    ->withoutOverlapping()
+                    ->onOneServer();
+            });
+        }
+
+        // The dependency advisory check behind the Security screen.
+        $securitySchedule = config('cg-cms.security.schedule');
+
+        if (is_string($securitySchedule) && $securitySchedule !== '') {
+            $this->callAfterResolving(Schedule::class, function (Schedule $scheduler) use ($securitySchedule): void {
+                $scheduler->command(SecurityAuditCommand::class)
+                    ->cron($securitySchedule)
                     ->withoutOverlapping()
                     ->onOneServer();
             });

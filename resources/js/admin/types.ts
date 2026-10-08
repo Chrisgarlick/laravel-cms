@@ -24,6 +24,8 @@ export interface SharedProps extends InertiaPageProps {
         seoBlocking: number
         queue: { pending: number; failed: number; stalled: boolean }
         mediaMissingAlt: number
+        /** Advisories against production dependencies, from the last check. */
+        security: number
     } | null
     auth: {
         user: { id: number; name: string; email: string } | null

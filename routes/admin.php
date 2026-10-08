@@ -12,6 +12,7 @@ use Cg\Cms\Http\Controllers\Admin\QueueController;
 use Cg\Cms\Http\Controllers\Admin\RedirectController;
 use Cg\Cms\Http\Controllers\Admin\SchemaController;
 use Cg\Cms\Http\Controllers\Admin\SearchController;
+use Cg\Cms\Http\Controllers\Admin\SecurityController;
 use Cg\Cms\Http\Controllers\Admin\SeoController;
 use Cg\Cms\Http\Controllers\Admin\SessionController;
 use Cg\Cms\Http\Controllers\Admin\SettingsController;
@@ -118,6 +119,12 @@ Route::middleware(AuthenticateAdmin::class)->group(function (): void {
         Route::post('/failed/{uuid}/retry', [QueueController::class, 'retry'])->name('retry');
         Route::delete('/failed/{uuid}', [QueueController::class, 'forget'])->name('forget');
         Route::delete('/jobs/{id}', [QueueController::class, 'cancel'])->whereNumber('id')->name('cancel');
+    });
+
+    Route::prefix('/security')->name('security.')->group(function (): void {
+        Route::get('/', [SecurityController::class, 'index'])->name('index');
+        // Two outbound API calls; a limit keeps a held-down button polite.
+        Route::post('/check', [SecurityController::class, 'check'])->middleware('throttle:10,1')->name('check');
     });
 
     Route::prefix('/settings')->name('settings.')->group(function (): void {
