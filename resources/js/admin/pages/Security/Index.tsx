@@ -145,7 +145,10 @@ function AdvisoryRow({ advisory }: { advisory: Advisory }) {
                 {advisory.reportedAt && ` · reported ${formatDate(advisory.reportedAt)}`}
             </p>
             <div className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-2 text-[12px] text-fg-muted">
-                <span>On your machine: <Kbd>{command}</Kbd>, then build and ship a release.</span>
+                <span>
+                    On your machine: <Kbd>{command}</Kbd>
+                    {advisory.dev ? ', then commit the lock file. No release is needed: development tools never reach the server.' : ', then build and ship a release.'}
+                </span>
                 {advisory.link && (
                     <a href={advisory.link} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-accent hover:underline">
                         Read the advisory <ExternalLink className="size-3" />
