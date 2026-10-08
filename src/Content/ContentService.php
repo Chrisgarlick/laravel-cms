@@ -247,6 +247,59 @@ final class ContentService
         ];
     }
 
+    /**
+     * Update an entry in place, live or not.
+     *
+     * For commands a person runs to install known content, such as a deploy
+     * step. The content CLI Claude uses never calls this: it goes through
+     * update(), which turns a change to a live entry into a proposal.
+     *
+     * @param  array<string, mixed>  $input
+     * @return array<string, mixed>
+     */
+    public function apply(Entry $entry, array $input, ?int $userId = null): array
+    {
+        $schema = $entry->schema();
+        $values = $this->prepare($schema, $input);
+
+        if ($values === []) {
+            throw new ContentException('Nothing to change.');
+        }
+
+        $this->validatePartial($schema, $values);
+        $entry->fill([...$this->payload->merged($entry, $this->payload->toAttributes($schema, $values)), 'updated_by' => $userId]);
+        $this->save($entry);
+
+        // Applying supersedes anything proposed against the old version.
+        EntryRevision::query()->where('entry_id', $entry->id)->where('label', self::PROPOSAL_LABEL)->delete();
+
+        return ['action' => 'applied', ...$this->describe($entry->refresh())];
+    }
+
+    /**
+     * Publish an entry, through the same publish gate as the admin.
+     *
+     * Only for commands a person runs (see apply()); the content CLI refuses
+     * to publish by design.
+     *
+     * @return array<string, mixed>
+     */
+    public function publish(Entry $entry, ?int $userId = null): array
+    {
+        if ($entry->status === 'published') {
+            return ['action' => 'unchanged', ...$this->describe($entry)];
+        }
+
+        $entry->fill([
+            'status' => 'published',
+            'published_at' => $entry->published_at ?? now(),
+            'updated_by' => $userId,
+        ]);
+        $this->save($entry);
+
+        return ['action' => 'published', ...$this->describe($entry->refresh())];
+    }
+
     public function proposal(Entry $entry): ?EntryRevision
     {
         return $entry->revisions()->where('label', self::PROPOSAL_LABEL)->first();
