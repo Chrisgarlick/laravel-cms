@@ -13,6 +13,7 @@ use Cg\Cms\Schema\Collection;
 use Cg\Cms\Schema\CollectionRegistry;
 use Cg\Cms\Schema\Field;
 use Cg\Cms\Seo\Checks\EntrySeoChecks;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -251,8 +252,8 @@ final class ContentService
      * Update an entry in place, live or not.
      *
      * For commands a person runs to install known content, such as a deploy
-     * step. The content CLI Claude uses never calls this: it goes through
-     * update(), which turns a change to a live entry into a proposal.
+     * step. cms:entry:update never calls this: it goes through update(),
+     * which turns a change to a live entry into a proposal.
      *
      * @param  array<string, mixed>  $input
      * @return array<string, mixed>
@@ -279,8 +280,8 @@ final class ContentService
     /**
      * Publish an entry, through the same publish gate as the admin.
      *
-     * Only for commands a person runs (see apply()); the content CLI refuses
-     * to publish by design.
+     * For commands a person runs (see apply()) and cms:entry:publish, which
+     * asks for confirmation. Creating and updating never publish.
      *
      * @return array<string, mixed>
      */
@@ -298,6 +299,71 @@ final class ContentService
         $this->save($entry);
 
         return ['action' => 'published', ...$this->describe($entry->refresh())];
+    }
+
+    /**
+     * Apply a live entry's waiting proposal, as applying it in the editor and
+     * saving does: through the same brand voice rules and publish gate.
+     *
+     * @return array<string, mixed>
+     */
+    public function applyProposal(Entry $entry, ?int $userId = null): array
+    {
+        $proposal = $this->proposal($entry);
+
+        if ($proposal === null) {
+            throw new ContentException('Nothing to publish: no proposal is waiting for this entry.');
+        }
+
+        $snapshot = $this->snapshot($proposal);
+        $entry->fill([
+            'title' => $snapshot['title'] ?? $entry->title,
+            'slug' => $snapshot['slug'] ?? $entry->slug,
+            'data' => $snapshot['data'] ?? $entry->data,
+            'seo' => $snapshot['seo'] ?? $entry->seo,
+            'updated_by' => $userId,
+        ]);
+        $this->save($entry);
+        $proposal->delete();
+
+        return ['action' => 'applied', ...$this->describe($entry->refresh())];
+    }
+
+    /**
+     * What a waiting proposal would change, field by field, as dotted keys
+     * (title, data.excerpt, seo.description) mapped to [now, proposed].
+     *
+     * @return array<string, array{0: mixed, 1: mixed}>
+     */
+    public function proposalChanges(Entry $entry): array
+    {
+        $proposal = $this->proposal($entry);
+
+        if ($proposal === null) {
+            return [];
+        }
+
+        $snapshot = $this->snapshot($proposal);
+        $now = Arr::dot(['title' => $entry->title, 'slug' => $entry->slug, 'data' => (array) $entry->data, 'seo' => (array) $entry->seo]);
+        $next = Arr::dot(['title' => $snapshot['title'] ?? null, 'slug' => $snapshot['slug'] ?? null,
+            'data' => (array) ($snapshot['data'] ?? []), 'seo' => (array) ($snapshot['seo'] ?? [])]);
+
+        $changes = [];
+        foreach (array_unique([...array_keys($now), ...array_keys($next)]) as $key) {
+            if (($now[$key] ?? null) !== ($next[$key] ?? null)) {
+                $changes[$key] = [$now[$key] ?? null, $next[$key] ?? null];
+            }
+        }
+
+        return $changes;
+    }
+
+    /** @return array<string, mixed> */
+    private function snapshot(EntryRevision $revision): array
+    {
+        $snapshot = $revision->snapshot;
+
+        return is_array($snapshot) ? $snapshot : (array) json_decode((string) $snapshot, true);
     }
 
     public function proposal(Entry $entry): ?EntryRevision

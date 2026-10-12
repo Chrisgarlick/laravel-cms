@@ -404,6 +404,7 @@ final class CgCmsServiceProvider extends ServiceProvider
                 Content\EntryCommand::class,
                 Content\CreateEntryCommand::class,
                 Content\UpdateEntryCommand::class,
+                Content\PublishEntryCommand::class,
                 Content\CheckEntryCommand::class,
             ]);
         }

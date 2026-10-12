@@ -60,8 +60,10 @@ final class EntryPayload
             $attributes['data'] = $data;
         }
 
+        // Only the SEO keys given: the editor sends them all, the CLI may send
+        // one, and merged() keeps the rest from the entry.
         if (array_key_exists('seo', $input) && is_array($input['seo'])) {
-            $attributes['seo'] = $this->seo($input['seo']);
+            $attributes['seo'] = array_intersect_key($this->seo($input['seo']), $input['seo']);
         }
 
         return $attributes;
