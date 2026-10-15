@@ -22,6 +22,7 @@ use Cg\Cms\Console\MakeBlockCommand;
 use Cg\Cms\Console\MakeCollectionCommand;
 use Cg\Cms\Console\PruneCacheCommand;
 use Cg\Cms\Console\SecurityAuditCommand;
+use Cg\Cms\Console\UserCommand;
 use Cg\Cms\Console\SeoAuditCommand;
 use Cg\Cms\Console\SeoFilesCommand;
 use Cg\Cms\Console\SyncSchemaCommand;
@@ -397,6 +398,7 @@ final class CgCmsServiceProvider extends ServiceProvider
                 AdminAssetsCommand::class,
                 SeoAuditCommand::class,
                 SecurityAuditCommand::class,
+                UserCommand::class,
                 MakeCollectionCommand::class,
                 MakeBlockCommand::class,
                 Content\CollectionsCommand::class,
