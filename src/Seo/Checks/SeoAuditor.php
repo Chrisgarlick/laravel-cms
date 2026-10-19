@@ -9,6 +9,7 @@ use Cg\Cms\Models\Entry;
 use Cg\Cms\Models\Redirect;
 use Cg\Cms\Models\SeoIssue;
 use Cg\Cms\Redirects\NotFoundHandler;
+use Cg\Cms\Redirects\RedirectResolver;
 use Cg\Cms\Schema\CollectionRegistry;
 use Cg\Cms\Seo\ServedRoutes;
 use Illuminate\Contracts\Http\Kernel as HttpKernel;
@@ -195,7 +196,15 @@ final class SeoAuditor
                 });
         }
 
-        return $pages;
+        // A URL that redirects isn't a page, and its page-error would be a
+        // finding nobody should act on: the same rule the sitemap uses.
+        $resolver = app(RedirectResolver::class);
+
+        return array_filter(
+            $pages,
+            fn (string $path): bool => $resolver->forced('/'.trim($path, '/')) === null && $resolver->resolve($path) === null,
+            ARRAY_FILTER_USE_KEY,
+        );
     }
 
     private function render(string $path): Response
