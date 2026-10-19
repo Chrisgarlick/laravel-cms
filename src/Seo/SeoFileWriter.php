@@ -66,6 +66,7 @@ final class SeoFileWriter
         $children = [];
         $skipped = [];
         $total = 0;
+        $listed = [];
 
         foreach ($this->collections->all() as $collection) {
             if (! $this->isRoutable($collection)) {
@@ -77,6 +78,7 @@ final class SeoFileWriter
             }
 
             $urls = $this->urlsFor($collection);
+            $listed = [...$listed, ...array_column($urls, 'loc')];
 
             if ($urls === []) {
                 continue;
@@ -94,8 +96,13 @@ final class SeoFileWriter
             }
         }
 
-        // Static entry points: the home page and every collection index.
-        $statics = $this->staticUrls();
+        // Static entry points: the home page, every collection index and any
+        // extra routes in config. A URL a collection already lists (a home
+        // page built as an entry, say) isn't listed twice.
+        $statics = array_values(array_filter(
+            $this->staticUrls(),
+            fn (array $url): bool => ! in_array($url['loc'], $listed, true),
+        ));
 
         if ($statics !== []) {
             $total += count($statics);
@@ -318,6 +325,15 @@ final class SeoFileWriter
                 'loc' => $domain.$path,
                 'lastmod' => $lastmod !== null ? Carbon::parse((string) $lastmod)->toAtomString() : null,
             ];
+        }
+
+        // Pages outside any collection, such as legal pages: cg-cms.seo.sitemap_paths.
+        foreach ((array) ($this->config['sitemap_paths'] ?? []) as $path) {
+            $path = '/'.ltrim((string) $path, '/');
+
+            if (! $this->isExcluded($path) && $this->routeExists($path)) {
+                $urls[] = ['loc' => $domain.$path, 'lastmod' => null];
+            }
         }
 
         return $urls;

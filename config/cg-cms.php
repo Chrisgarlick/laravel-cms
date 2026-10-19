@@ -144,6 +144,9 @@ return [
 
         // Relative paths are resolved against site.domain.
         'image' => env('CG_SEO_IMAGE'),
+
+        // Routes outside any collection to list in the sitemap, e.g. ['/privacy', '/terms'].
+        'sitemap_paths' => [],
         'image_alt' => env('CG_SEO_IMAGE_ALT'),
 
         'twitter' => env('CG_SEO_TWITTER'),
