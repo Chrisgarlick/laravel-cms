@@ -42,7 +42,7 @@ export default function SlugField({ field, value, onChange, values }: FieldProps
             <input
                 id={`field-${field.name}`}
                 type="text"
-                className="field-input field-mono"
+                className="kit-input font-mono"
                 value={current}
                 required={field.required}
                 onChange={(event) => {
@@ -52,7 +52,7 @@ export default function SlugField({ field, value, onChange, values }: FieldProps
             />
 
             {field.preview !== null && field.preview !== undefined && (
-                <p className="field-help field-mono">
+                <p className="kit-field-hint font-mono">
                     {field.preview.replace('{slug}', current || 'untitled')}
                 </p>
             )}

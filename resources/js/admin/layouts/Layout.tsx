@@ -90,8 +90,8 @@ export default function Layout({ children }: { children: ReactNode }) {
                 </Link>
             </div>
 
-            <nav className="flex-1 space-y-5 overflow-y-auto px-2 pt-1 pb-4" aria-label="Admin">
-                <ul className="space-y-px">
+            <nav className={'kit-sidebar flex-1 overflow-y-auto px-2 pt-1 pb-4'} aria-label="Admin">
+                <ul>
                     <SideLink item={{ href: cms.prefix, label: 'Dashboard', icon: <LayoutDashboard /> }} active={isActive(cms.prefix)} compact={compact} />
                 </ul>
                 <SideGroup label="Content" compact={compact}>
@@ -130,7 +130,7 @@ export default function Layout({ children }: { children: ReactNode }) {
                 )}
 
                 <div className="flex min-w-0 flex-1 flex-col">
-                    <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-2 border-b border-line bg-canvas/85 px-3 backdrop-blur-md md:px-5">
+                    <header className="kit-topbar h-14 shrink-0 gap-2 px-3 md:px-5" data-sticky="">
                         <span className="contents md:hidden">
                             <Button variant="ghost" size="icon" onClick={() => setMobileOpen(true)} aria-label="Open navigation">
                                 <MenuIcon className="size-4" />
@@ -146,18 +146,19 @@ export default function Layout({ children }: { children: ReactNode }) {
 
                         <Breadcrumb path={path} />
 
-                        <div className="ml-auto flex items-center gap-1.5">
+                        <div className="kit-topbar-actions">
                             <button
                                 type="button"
                                 onClick={() => setPaletteOpen(true)}
-                                className="flex h-8 items-center gap-2 rounded-[var(--radius-control)] border border-line bg-panel pr-1.5 pl-2.5 text-[13px] text-fg-subtle shadow-sm transition-colors hover:border-line-strong hover:text-fg-muted sm:w-56"
+                                className="kit-button justify-start font-normal text-fg-subtle sm:w-56"
+                                data-size="sm"
                             >
                                 <Search className="size-3.5" />
                                 <span className="hidden flex-1 text-left sm:block">Search…</span>
                                 <span className="hidden gap-0.5 sm:flex"><Kbd>⌘</Kbd><Kbd>K</Kbd></span>
                             </button>
                             <Tooltip content="View site">
-                                <a href="/" target="_blank" rel="noreferrer" className="inline-flex size-8 items-center justify-center rounded-[var(--radius-control)] text-fg-muted hover:bg-hover hover:text-fg" aria-label="View site">
+                                <a href="/" target="_blank" rel="noreferrer" className="kit-button" data-variant="ghost" data-icon="" aria-label="View site">
                                     <ExternalLink className="size-4" />
                                 </a>
                             </Tooltip>
@@ -239,31 +240,20 @@ export default function Layout({ children }: { children: ReactNode }) {
 
 function SideGroup({ label, compact, children }: { label: string; compact: boolean; children: ReactNode }) {
     return (
-        <div>
-            {compact ? <div className="mx-3 mb-2 h-px bg-line" /> : <div className="px-2.5 pb-1.5 text-[10.5px] font-semibold tracking-[0.08em] text-fg-subtle uppercase">{label}</div>}
-            <ul className="space-y-px">{children}</ul>
-        </div>
+        <>
+            {compact ? <hr className="mx-3 my-3 border-line" /> : <p className="kit-sidebar-label">{label}</p>}
+            <ul>{children}</ul>
+        </>
     )
 }
 
 function SideLink({ item, active, compact }: { item: NavItem; active: boolean; compact: boolean }) {
     const link = (
-        <Link
-            href={item.href}
-            aria-current={active ? 'page' : undefined}
-            className={cn(
-                'group relative flex h-8 items-center gap-2.5 rounded-[var(--radius-control)] text-[13px] transition-colors',
-                compact ? 'justify-center' : 'px-2.5',
-                active ? 'bg-accent-soft font-medium text-fg' : 'text-fg-muted hover:bg-hover hover:text-fg',
-                '[&>svg]:size-4 [&>svg]:shrink-0',
-                active ? '[&>svg]:text-accent' : '[&>svg]:text-fg-subtle group-hover:[&>svg]:text-fg-muted',
-            )}
-        >
-            {active && !compact && <span className="absolute top-1.5 bottom-1.5 -left-2 w-[3px] rounded-r-full bg-accent" aria-hidden />}
+        <Link href={item.href} aria-current={active ? 'page' : undefined} className={cn('relative', compact && 'justify-center !px-0')}>
             {item.icon}
             {!compact && <span className="flex-1 truncate">{item.label}</span>}
-            {!compact && item.count !== undefined && item.count > 0 && <span className="text-[11.5px] tabular-nums text-fg-subtle">{item.count}</span>}
-            {item.attention && <span className={cn('size-1.5 rounded-full bg-accent', compact && 'absolute top-1.5 right-2')} aria-label="Needs attention" />}
+            {!compact && item.count !== undefined && item.count > 0 && <span className="kit-sidebar-meta">{item.count}</span>}
+            {item.attention && <span className={cn('kit-dot text-accent', compact && 'absolute top-1.5 right-2')} aria-label="Needs attention" />}
         </Link>
     )
 

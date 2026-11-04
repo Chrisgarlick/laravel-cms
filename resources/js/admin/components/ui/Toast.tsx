@@ -1,7 +1,6 @@
 import { Toast as RadixToast } from 'radix-ui'
 import { CircleAlert, CircleCheck, X } from 'lucide-react'
 import { useSyncExternalStore, type ReactNode } from 'react'
-import { cn } from './cn'
 
 interface ToastItem {
     id: number
@@ -33,11 +32,14 @@ export function toast(title: string, options: { tone?: ToastItem['tone']; action
     emit()
 }
 
+// kit's toast colours the icon by tone.
 const icons: Record<ToastItem['tone'], ReactNode> = {
-    success: <CircleCheck className="size-4 text-success" />,
-    error: <CircleAlert className="size-4 text-danger" />,
-    info: <CircleAlert className="size-4 text-info" />,
+    success: <CircleCheck />,
+    error: <CircleAlert />,
+    info: <CircleAlert />,
 }
+
+const tones: Record<ToastItem['tone'], string> = { success: 'good', error: 'bad', info: 'info' }
 
 /** Mounted once in the layout. */
 export function Toaster() {
@@ -57,28 +59,26 @@ export function Toaster() {
                     key={item.id}
                     duration={item.tone === 'error' ? 8000 : 5000}
                     onOpenChange={(open) => !open && dismiss(item.id)}
-                    className={cn(
-                        'flex items-center gap-3 rounded-[var(--radius-card)] border border-line bg-elevated py-2.5 pr-2 pl-3.5 shadow-lg',
-                        'data-[state=open]:animate-slide-in data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)]',
-                    )}
+                    className="kit-toast data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)]"
+                    data-tone={tones[item.tone]}
                 >
                     {icons[item.tone]}
-                    <RadixToast.Title className="flex-1 text-[13px] font-medium">{item.title}</RadixToast.Title>
+                    <div className="kit-toast-body">
+                        <RadixToast.Title asChild>
+                            <p className="kit-toast-title">{item.title}</p>
+                        </RadixToast.Title>
+                    </div>
                     {item.action && (
-                        <RadixToast.Action
-                            altText={item.action.label}
-                            onClick={item.action.onClick}
-                            className="h-7 rounded-md px-2 text-[12.5px] font-medium text-accent hover:bg-accent-soft"
-                        >
-                            {item.action.label}
+                        <RadixToast.Action asChild altText={item.action.label} onClick={item.action.onClick}>
+                            <button type="button" className="kit-button" data-variant="ghost" data-size="sm">{item.action.label}</button>
                         </RadixToast.Action>
                     )}
-                    <RadixToast.Close className="rounded-md p-1 text-fg-subtle hover:bg-hover hover:text-fg" aria-label="Dismiss">
-                        <X className="size-3.5" />
+                    <RadixToast.Close className="kit-toast-close" aria-label="Dismiss">
+                        <X />
                     </RadixToast.Close>
                 </RadixToast.Root>
             ))}
-            <RadixToast.Viewport className="fixed right-4 bottom-4 z-[60] flex w-[min(380px,calc(100vw-32px))] flex-col gap-2 outline-none" />
+            <RadixToast.Viewport className="kit-toasts" data-open="" />
         </RadixToast.Provider>
     )
 }

@@ -74,7 +74,7 @@ export default function Dropzone({ accept, uploads, onFiles, onClear }: Props) {
                     {uploads.map((upload) => (
                         <li key={upload.key} className={`upload is-${upload.state}`}>
                             <span className="upload-name">{upload.name}</span>
-                            <progress max={100} value={upload.progress} aria-label={`Upload of ${upload.name}`} />
+                            <progress className="kit-progress" max={100} value={upload.progress} aria-label={`Upload of ${upload.name}`} />
                             <span className="upload-state">{describe(upload)}</span>
                         </li>
                     ))}
@@ -82,7 +82,7 @@ export default function Dropzone({ accept, uploads, onFiles, onClear }: Props) {
             )}
 
             {finished.length > 0 && (
-                <button type="button" className="button-quiet" onClick={onClear}>
+                <button type="button" className="kit-button" data-size="sm" onClick={onClear}>
                     Clear finished
                 </button>
             )}

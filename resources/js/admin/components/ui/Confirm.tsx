@@ -9,13 +9,12 @@ export function Confirm({ open, onOpenChange, title, description, confirmLabel =
             open={open}
             onOpenChange={onOpenChange}
             title={title}
-            className="!w-[min(420px,calc(100vw-32px))]"
+            size="sm"
             footer={
                 <>
                     <Button onClick={() => onOpenChange(false)}>Cancel</Button>
                     <Button
                         variant={danger ? 'danger' : 'primary'}
-                        className={danger ? '!bg-danger !text-white hover:!opacity-90' : undefined}
                         onClick={() => {
                             onOpenChange(false)
                             onConfirm()
@@ -26,7 +25,7 @@ export function Confirm({ open, onOpenChange, title, description, confirmLabel =
                 </>
             }
         >
-            <div className="text-[13.5px] text-fg-muted">{description}</div>
+            {description}
         </Dialog>
     )
 }

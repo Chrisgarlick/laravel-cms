@@ -33,7 +33,7 @@ export default function RelationField({ field, value, onChange }: FieldProps<str
 
     if (choices.length === 0) {
         return (
-            <p className="field-help">
+            <p className="kit-field-hint">
                 Nothing to link to yet. Create an entry in{' '}
                 <strong>{field.relatedCollection}</strong> first.
             </p>
@@ -59,7 +59,7 @@ export default function RelationField({ field, value, onChange }: FieldProps<str
             {choices.length > 8 && (
                 <input
                     type="search"
-                    className="field-input"
+                    className="kit-input"
                     placeholder={`Filter ${choices.length} options`}
                     value={filter}
                     onChange={(event) => setFilter(event.target.value)}
@@ -69,9 +69,10 @@ export default function RelationField({ field, value, onChange }: FieldProps<str
             <ul className="field-choices">
                 {visible.map((choice) => (
                     <li key={choice.value}>
-                        <label className="field-check">
+                        <label className="kit-choice">
                             <input
                                 type={field.many ? 'checkbox' : 'radio'}
+                                className={field.many ? 'kit-checkbox' : 'kit-radio'}
                                 name={`field-${field.name}`}
                                 checked={selected.has(choice.value)}
                                 onChange={() => toggle(choice.value)}
@@ -88,7 +89,7 @@ export default function RelationField({ field, value, onChange }: FieldProps<str
                 somebody saves an entry having silently dropped a tag.
             */}
             {selected.size > 0 && visible.length < choices.length && (
-                <p className="field-help">
+                <p className="kit-field-hint">
                     Selected: {[...selected].join(', ')}
                 </p>
             )}

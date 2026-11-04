@@ -86,7 +86,7 @@ export default function Index({ filters, forms, submissions }: Props) {
             <PageHeader
                 title="Leads"
                 description="Everything submitted through the site's forms. The email is a notification; this is the record."
-                actions={<a href={exportUrl} className="button-quiet"><Download className="size-3.5" />Export CSV</a>}
+                actions={<a href={exportUrl} className="kit-button" data-size="sm"><Download className="size-3.5" />Export CSV</a>}
             />
 
             <div className="mb-4 flex flex-wrap items-center gap-2">
@@ -100,7 +100,7 @@ export default function Index({ filters, forms, submissions }: Props) {
                     ]}
                 />
                 <select
-                    className="field-input !h-8 !min-h-0 !w-auto !py-0 text-[13px]"
+                    className="kit-select !w-auto"
                     value={filters.form}
                     onChange={(event) => go({ form: event.target.value || undefined, page: undefined })}
                     aria-label="Form"
@@ -219,7 +219,7 @@ function LeadDetail({ submission, formName, onBack, onDelete }: { submission: Su
                 </div>
                 <div className="flex shrink-0 items-center gap-1.5">
                     {email && submission.rejectedFor === null && (
-                        <a href={`mailto:${email}?subject=${encodeURIComponent(`Re: your ${formName.toLowerCase()}`)}`} className="button !h-8"><Mail className="size-3.5" />Reply</a>
+                        <a href={`mailto:${email}?subject=${encodeURIComponent(`Re: your ${formName.toLowerCase()}`)}`} className="kit-button" data-variant="primary" data-size="sm"><Mail className="size-3.5" />Reply</a>
                     )}
                     <Tooltip content="Delete">
                         <Button size="icon" variant="ghost" onClick={onDelete} aria-label="Delete lead"><Trash2 className="size-4" /></Button>

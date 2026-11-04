@@ -3,7 +3,7 @@ import { Eye, PanelsTopLeft, PenLine } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { BlockPreviewFrame } from '../components/BlockPreviewFrame'
 import ItemList, { newKey, withoutKeys, type Item } from '../components/ItemList'
-import { Dialog, cn } from '../components/ui'
+import { Dialog } from '../components/ui'
 import type { SharedProps } from '../types'
 import FieldRenderer from './FieldRenderer'
 import type { FieldProps, FieldSchema } from './types'
@@ -75,7 +75,7 @@ export default function BlocksField({ field, value, onChange, error }: FieldProp
         allowed.find((block) => block.handle === handle)?.label ?? handle
 
     if (allowed.length === 0) {
-        return <p className="field-help">This field allows no block types.</p>
+        return <p className="kit-field-hint">This field allows no block types.</p>
     }
 
     return (
@@ -122,7 +122,7 @@ export default function BlocksField({ field, value, onChange, error }: FieldProp
 
                     return (
                         <div className="itemlist-fields">
-                            <div className="flex w-fit rounded-[var(--radius-control)] bg-sunken p-0.5" role="tablist">
+                            <div className="kit-segmented w-fit" role="radiogroup" aria-label="Show">
                                 {[
                                     { on: false, label: 'Fields', icon: <PenLine className="size-3.5" /> },
                                     { on: true, label: 'Preview', icon: <Eye className="size-3.5" /> },
@@ -130,10 +130,9 @@ export default function BlocksField({ field, value, onChange, error }: FieldProp
                                     <button
                                         key={mode.label}
                                         type="button"
-                                        role="tab"
-                                        aria-selected={showing === mode.on}
+                                        role="radio"
+                                        aria-checked={showing === mode.on}
                                         onClick={() => showing !== mode.on && togglePreview(row._key)}
-                                        className={cn('inline-flex h-7 items-center gap-1.5 rounded-[5px] px-2.5 text-[12.5px] font-medium', showing === mode.on ? 'bg-panel text-fg shadow-sm' : 'text-fg-muted hover:text-fg')}
                                     >
                                         {mode.icon}
                                         {mode.label}
@@ -158,12 +157,12 @@ export default function BlocksField({ field, value, onChange, error }: FieldProp
             </ItemList>
 
             <div className="block-picker">
-                <span className="field-help">Add a block:</span>
+                <span className="kit-field-hint">Add a block:</span>
                 {allowed.map((block) => (
                     <button
                         key={block.handle}
                         type="button"
-                        className="button-quiet"
+                        className="kit-button" data-size="sm"
                         onClick={() =>
                             update([
                                 ...rows,
@@ -176,9 +175,9 @@ export default function BlocksField({ field, value, onChange, error }: FieldProp
                 ))}
             </div>
 
-            {error !== undefined && <p className="field-error">{error}</p>}
+            {error !== undefined && <p className="kit-field-error">{error}</p>}
 
-            <Dialog open={pagePreview} onOpenChange={setPagePreview} title="Page preview" description="Every block, in order, as the site renders it. Unsaved changes included." className="!w-[min(1200px,calc(100vw-32px))] !max-h-[88vh] !top-[6vh]">
+            <Dialog open={pagePreview} onOpenChange={setPagePreview} title="Page preview" description="Every block, in order, as the site renders it. Unsaved changes included." className="[--_w:75rem] max-h-[min(100%-32px,56rem)]">
                 {pagePreview && <BlockPreviewFrame blocks={rows.map((row) => ({ type: row.type, data: row.data }))} prefix={cms.prefix} className="border-0" />}
             </Dialog>
         </>

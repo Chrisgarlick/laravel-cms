@@ -4,7 +4,7 @@
     $site = (string) config('cg-cms.site.name');
 @endphp
 <!DOCTYPE html>
-<html lang="en-GB">
+<html lang="en-GB" data-density="compact">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -36,34 +36,34 @@
                 <p class="mt-1.5 text-[14px] text-fg-muted">Sign in to manage {{ $site }}.</p>
 
                 @if (session('error'))
-                    <p class="mt-6 rounded-[var(--radius-control)] border border-danger/25 bg-danger-soft px-3 py-2 text-[13px] text-danger" role="alert">{{ session('error') }}</p>
+                    <div class="kit-alert mt-6 !grid-cols-1" data-tone="bad" role="alert"><p>{{ session('error') }}</p></div>
                 @endif
 
                 @error('email')
-                    <p class="mt-6 rounded-[var(--radius-control)] border border-danger/25 bg-danger-soft px-3 py-2 text-[13px] text-danger" role="alert">{{ $message }}</p>
+                    <div class="kit-alert mt-6 !grid-cols-1" data-tone="bad" role="alert"><p>{{ $message }}</p></div>
                 @enderror
 
                 <form method="POST" action="{{ route('cgcms.admin.signin.store') }}" class="mt-7 space-y-4">
                     @csrf
 
-                    <div>
-                        <label for="email" class="mb-1.5 block text-[12.5px] font-medium">Email</label>
+                    <div class="kit-field">
+                        <label for="email">Email</label>
                         <input id="email" type="email" name="email" value="{{ old('email') }}" autocomplete="username" required autofocus
-                               class="field-input !h-10 !text-[14px]" placeholder="you@example.com">
+                               class="kit-input" placeholder="you@example.com">
                     </div>
 
-                    <div>
-                        <label for="password" class="mb-1.5 block text-[12.5px] font-medium">Password</label>
+                    <div class="kit-field">
+                        <label for="password">Password</label>
                         <input id="password" type="password" name="password" autocomplete="current-password" required
-                               class="field-input !h-10 !text-[14px]">
+                               class="kit-input">
                     </div>
 
-                    <label class="flex cursor-pointer items-center gap-2 text-[13px] text-fg-muted">
-                        <input type="checkbox" name="remember" value="1" class="size-4 accent-[var(--accent)]">
+                    <label class="kit-choice">
+                        <input type="checkbox" name="remember" value="1" class="kit-checkbox">
                         Stay signed in on this device
                     </label>
 
-                    <button type="submit" class="flex h-10 w-full items-center justify-center rounded-[var(--radius-control)] bg-accent text-[14px] font-medium text-on-accent shadow-[inset_0_1px_0_rgb(255_255_255/0.18),var(--shadow-sm)] transition-colors hover:bg-accent-hover focus-visible:ring-3 focus-visible:ring-[var(--accent-ring)] focus-visible:outline-none">
+                    <button type="submit" class="kit-button w-full" data-variant="primary" data-size="lg">
                         Sign in
                     </button>
                 </form>

@@ -53,7 +53,7 @@ export default function Index({ tab, redirects, notFound }: Props) {
                 description="Old URLs pointed at new ones. Renaming a slug adds one automatically."
                 actions={
                     <>
-                        <a className="button-quiet" href={`${base}/export`}><Download className="size-3.5" />Export</a>
+                        <a className="kit-button" data-size="sm" href={`${base}/export`}><Download className="size-3.5" />Export</a>
                         <ImportButton url={`${base}/import`} />
                         <Button variant="primary" icon={<Plus className="size-4" />} onClick={() => setCreating(true)}>New redirect</Button>
                     </>
@@ -102,50 +102,50 @@ function RedirectsView({ rules, base, onCreate }: { rules: Rule[]; base: string;
                     value={filter}
                     onChange={(event) => setFilter(event.target.value)}
                     placeholder="Filter by path"
-                    className="h-8 w-full rounded-[var(--radius-control)] border border-line bg-panel pr-2 pl-8 text-[13px] shadow-sm placeholder:text-fg-subtle focus:border-accent focus:ring-3 focus:ring-[var(--accent-ring)] focus:outline-none"
+                    className="kit-input pl-8"
                 />
             </div>
 
             <Card className="overflow-hidden">
                 <div className="overflow-x-auto">
-                    <table className="w-full min-w-[720px] text-[13px]">
+                    <table className="kit-table min-w-[720px] [&_td]:whitespace-normal">
                         <thead>
-                            <tr className="border-b border-line bg-sunken/60 text-left text-[11.5px] text-fg-subtle">
-                                <th className="py-2 pl-4 font-medium">From</th>
-                                <th className="py-2 pr-4 font-medium">To</th>
-                                <th className="py-2 pr-4 font-medium">Type</th>
-                                <th className="py-2 pr-4 font-medium">Used</th>
+                            <tr>
+                                <th>From</th>
+                                <th>To</th>
+                                <th>Type</th>
+                                <th>Used</th>
                                 <th className="w-12" />
                             </tr>
                         </thead>
                         <tbody>
                             {shown.map((rule) => (
-                                <tr key={rule.id} className="group border-b border-line last:border-b-0 hover:bg-hover/50">
-                                    <td className="max-w-[280px] py-2.5 pl-4">
+                                <tr key={rule.id} className="group">
+                                    <td className="max-w-[280px]">
                                         <code className="block truncate text-[12.5px]" title={rule.from}>{rule.from}</code>
                                         {rule.automatic && <span className="text-[11.5px] text-fg-subtle" title={rule.notes ?? ''}>Added when a slug changed</span>}
                                     </td>
-                                    <td className="max-w-[280px] py-2.5 pr-4">
+                                    <td className="max-w-[280px]">
                                         <span className="flex items-center gap-2">
                                             <ArrowRight className="size-3.5 shrink-0 text-fg-subtle" />
                                             {rule.status === 410 ? <Badge tone="danger">Gone</Badge> : <code className="truncate text-[12.5px]" title={rule.to}>{rule.to}</code>}
                                         </span>
                                     </td>
-                                    <td className="py-2.5 pr-4">
+                                    <td>
                                         <span className="flex flex-wrap gap-1">
                                             <Badge tone={rule.status === 301 ? 'neutral' : rule.status === 302 ? 'info' : 'danger'}>{rule.status}</Badge>
                                             {rule.matchType !== 'exact' && <Badge tone="accent">{rule.matchType}</Badge>}
                                             {rule.force && <Badge tone="warning">forced</Badge>}
                                         </span>
                                     </td>
-                                    <td className="py-2.5 pr-4 text-fg-muted">
+                                    <td className="text-fg-muted">
                                         {rule.hits === 0 ? (
                                             <span className="text-fg-subtle">Never</span>
                                         ) : (
                                             <span className="tabular-nums">{rule.hits.toLocaleString('en-GB')} <span className="text-fg-subtle">· {timeAgo(rule.lastHitAt)}</span></span>
                                         )}
                                     </td>
-                                    <td className="py-2.5 pr-3 text-right">
+                                    <td className="text-right">
                                         {!rule.automatic && (
                                             <Tooltip content="Delete">
                                                 <button type="button" onClick={() => setDeleting(rule)} className="inline-flex size-7 items-center justify-center rounded-md text-fg-subtle opacity-0 group-hover:opacity-100 hover:bg-danger-soft hover:text-danger focus-visible:opacity-100" aria-label={`Delete ${rule.from}`}>
@@ -299,7 +299,7 @@ function NotFoundView({ misses, base }: { misses: Miss[]; base: string }) {
 
 function ImportButton({ url }: { url: string }) {
     return (
-        <label className="button-quiet cursor-pointer">
+        <label className="kit-button cursor-pointer" data-size="sm">
             <Upload className="size-3.5" />
             Import
             <input

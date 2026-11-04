@@ -15,7 +15,7 @@ export default function DatetimeField({ field, value, onChange }: FieldProps<str
         <input
             id={`field-${field.name}`}
             type="datetime-local"
-            className="field-input field-narrow"
+            className="kit-input max-w-xs"
             value={local}
             required={field.required}
             onChange={(event) => {

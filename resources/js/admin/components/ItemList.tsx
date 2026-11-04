@@ -184,12 +184,12 @@ export default function ItemList<T extends Item>({
                 </SortableContext>
             </DndContext>
 
-            {items.length === 0 && <p className="field-help">Nothing here yet.</p>}
+            {items.length === 0 && <p className="kit-field-hint">Nothing here yet.</p>}
 
             {onAdd !== undefined && (
                 <button
                     type="button"
-                    className="button-quiet"
+                    className="kit-button" data-size="sm"
                     disabled={atMax || disabled}
                     onClick={() => {
                         const item = onAdd()
@@ -203,7 +203,7 @@ export default function ItemList<T extends Item>({
                 </button>
             )}
 
-            {atMax && <p className="field-help">Maximum of {max} reached.</p>}
+            {atMax && <p className="kit-field-hint">Maximum of {max} reached.</p>}
         </div>
     )
 }
@@ -264,18 +264,18 @@ function Row({
                 </button>
 
                 <span className="itemlist-actions">
-                    <button type="button" className="button-quiet" onClick={onToggle}>
+                    <button type="button" className="kit-button" data-size="sm" onClick={onToggle}>
                         {collapsed ? 'Open' : 'Close'}
                     </button>
 
                     {onDuplicate !== undefined && (
-                        <button type="button" className="button-quiet" onClick={onDuplicate}>
+                        <button type="button" className="kit-button" data-size="sm" onClick={onDuplicate}>
                             Duplicate
                         </button>
                     )}
 
                     {onRemove !== undefined && (
-                        <button type="button" className="button-quiet" onClick={onRemove}>
+                        <button type="button" className="kit-button" data-size="sm" onClick={onRemove}>
                             Remove
                         </button>
                     )}

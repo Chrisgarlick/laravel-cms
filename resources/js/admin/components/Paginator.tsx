@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import type { MouseEvent } from 'react'
 
 interface Props {
     currentPage: number
@@ -9,8 +9,9 @@ interface Props {
 /**
  * Page controls for a server-paginated table.
  *
- * Buttons rather than links, because every table in the admin navigates with
- * an Inertia partial reload and a real anchor would cost a full page visit.
+ * kit's pagination. Links, so a page can open in a new tab, but a plain click
+ * is intercepted: every table in the admin navigates with an Inertia partial
+ * reload, and following the anchor would cost a full page visit.
  *
  * The window is deliberately small: first, last, and two either side of where
  * you are. A collection with forty pages renders forty links otherwise, which
@@ -22,7 +23,20 @@ export default function Paginator({ currentPage, lastPage, onGo }: Props) {
     }
 
     const pages = windowed(currentPage, lastPage)
-    const button = 'inline-flex h-7 min-w-7 items-center justify-center rounded-[var(--radius-control)] px-2 text-[12.5px] tabular-nums transition-colors disabled:pointer-events-none disabled:opacity-40'
+
+    // Real links (kit's pagination styles anchors), so a page opens in a new
+    // tab; a plain click stays an Inertia partial reload.
+    const link = (page: number) => {
+        const url = new URL(window.location.href)
+        url.searchParams.set('page', String(page))
+
+        return url.pathname + url.search
+    }
+    const go = (page: number) => (event: MouseEvent) => {
+        if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return
+        event.preventDefault()
+        onGo(page)
+    }
 
     return (
         <nav className="mt-4 flex items-center justify-between gap-2" aria-label="Pagination">
@@ -30,34 +44,20 @@ export default function Paginator({ currentPage, lastPage, onGo }: Props) {
                 Page {currentPage} of {lastPage}
             </span>
 
-            <div className="flex items-center gap-0.5">
-                <button type="button" className={`${button} text-fg-muted hover:bg-hover hover:text-fg`} disabled={currentPage === 1} onClick={() => onGo(currentPage - 1)} aria-label="Previous page">
-                    <ChevronLeft className="size-4" />
-                </button>
-
+            <ul className="kit-pagination">
+                <li>{currentPage === 1 ? <span aria-disabled="true">Previous</span> : <a href={link(currentPage - 1)} rel="prev" onClick={go(currentPage - 1)}>Previous</a>}</li>
                 {pages.map((page, index) =>
                     page === null ? (
                         // eslint-disable-next-line react/no-array-index-key
-                        <span key={`gap-${index}`} className="px-1 text-fg-subtle" aria-hidden>
-                            …
-                        </span>
+                        <li key={`gap-${index}`} className="kit-pagination-gap" aria-hidden>…</li>
                     ) : (
-                        <button
-                            key={page}
-                            type="button"
-                            className={`${button} ${page === currentPage ? 'bg-selected font-medium text-fg' : 'text-fg-muted hover:bg-hover hover:text-fg'}`}
-                            aria-current={page === currentPage ? 'page' : undefined}
-                            onClick={() => onGo(page)}
-                        >
-                            {page}
-                        </button>
+                        <li key={page}>
+                            <a href={link(page)} aria-current={page === currentPage ? 'page' : undefined} onClick={go(page)}>{page}</a>
+                        </li>
                     ),
                 )}
-
-                <button type="button" className={`${button} text-fg-muted hover:bg-hover hover:text-fg`} disabled={currentPage === lastPage} onClick={() => onGo(currentPage + 1)} aria-label="Next page">
-                    <ChevronRight className="size-4" />
-                </button>
-            </div>
+                <li>{currentPage === lastPage ? <span aria-disabled="true">Next</span> : <a href={link(currentPage + 1)} rel="next" onClick={go(currentPage + 1)}>Next</a>}</li>
+            </ul>
         </nav>
     )
 }

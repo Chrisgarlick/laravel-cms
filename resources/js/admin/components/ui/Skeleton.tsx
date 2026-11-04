@@ -1,5 +1,6 @@
 import { cn } from './cn'
 
+/** kit's skeleton; size it with utilities (h-4 w-20) like the content it stands in for. */
 export function Skeleton({ className }: { className?: string }) {
-    return <div className={cn('animate-pulse rounded-md bg-sunken', className)} aria-hidden />
+    return <span className={cn('kit-skeleton', className)} aria-hidden />
 }

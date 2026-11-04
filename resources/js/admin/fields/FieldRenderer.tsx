@@ -44,11 +44,11 @@ export default function FieldRenderer({ field, value, values, error, onChange }:
     const labelled = field.type !== 'boolean' && field.type !== 'group'
 
     return (
-        <div id={labelled ? undefined : `field-${field.name}`} className={`field field-type-${field.type}${error ? ' has-error' : ''} animate-in`}>
+        <div id={labelled ? undefined : `field-${field.name}`} className={`kit-field field-type-${field.type}${error ? ' has-error' : ''} animate-in`}>
             {labelled && (
-                <label className="field-label" htmlFor={`field-${field.name}`}>
+                <label className="kit-field-label" htmlFor={`field-${field.name}`}>
                     {field.label}
-                    {field.required && <span className="field-required">Required</span>}
+                    {field.required && <span className="kit-field-optional">Required</span>}
                 </label>
             )}
 
@@ -60,9 +60,9 @@ export default function FieldRenderer({ field, value, values, error, onChange }:
                 onChange={(next: unknown) => onChange(field.name, next)}
             />
 
-            {field.help !== null && field.type !== 'group' && <p className="field-help">{field.help}</p>}
+            {field.help !== null && field.type !== 'group' && <p className="kit-field-hint">{field.help}</p>}
 
-            {error !== undefined && <p className="field-error">{error}</p>}
+            {error !== undefined && <p className="kit-field-error">{error}</p>}
         </div>
     )
 }

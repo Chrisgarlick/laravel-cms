@@ -1,4 +1,5 @@
 import { usePage } from '@inertiajs/react'
+import { X } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import Dropzone from '@/components/Dropzone'
 import Paginator from '@/components/Paginator'
@@ -90,26 +91,28 @@ export default function MediaPicker({
     })
 
     return (
-        <dialog ref={dialog} className="picker" onClose={onClose} aria-label="Choose an image">
-            <header className="drawer-head">
-                <h2 className="drawer-title">Choose an image</h2>
-                <button type="button" className="button-quiet" onClick={onClose}>
-                    Close
+        <dialog ref={dialog} className="kit-dialog" data-size="lg" onClose={onClose} aria-label="Choose an image">
+            <header className="kit-dialog-header">
+                <h2>Choose an image</h2>
+                <button type="button" className="kit-button" data-variant="ghost" data-size="sm" data-icon="" aria-label="Close" onClick={onClose}>
+                    <X />
                 </button>
             </header>
+
+            <div className="kit-dialog-body space-y-3">
 
             <Dropzone accept={cms.media.accept} uploads={uploader.uploads} onFiles={uploader.add} onClear={uploader.clear} />
 
             <input
                 type="search"
-                className="field-input"
+                className="kit-input"
                 placeholder="Search filename or alt text"
                 value={q}
                 onChange={(event) => setQ(event.target.value)}
                 aria-label="Search media"
             />
 
-            {failed && <p className="field-error">The library could not be loaded. Close and try again.</p>}
+            {failed && <p className="kit-field-error">The library could not be loaded. Close and try again.</p>}
 
             {result === null && !failed && <p className="field-loading">Loading</p>}
 
@@ -133,7 +136,7 @@ export default function MediaPicker({
                                 <span className="media-tile-name">{item.filename}</span>
                                 {!item.alt && (
                                     <span className="media-tile-meta">
-                                        <span className="pill is-warn">no alt</span>
+                                        <span className="kit-badge" data-tone="warn">no alt</span>
                                     </span>
                                 )}
                             </button>
@@ -143,6 +146,7 @@ export default function MediaPicker({
             )}
 
             {result !== null && <Paginator currentPage={result.currentPage} lastPage={result.lastPage} onGo={setPage} />}
+            </div>
         </dialog>
     )
 }

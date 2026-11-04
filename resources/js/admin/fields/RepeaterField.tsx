@@ -81,7 +81,7 @@ export default function RepeaterField({ field, value, onChange, error }: FieldPr
                 schema rather than the form's error bag, so the message is
                 shown here with its position intact.
             */}
-            {error !== undefined && <p className="field-error">{error}</p>}
+            {error !== undefined && <p className="kit-field-error">{error}</p>}
         </>
     )
 }

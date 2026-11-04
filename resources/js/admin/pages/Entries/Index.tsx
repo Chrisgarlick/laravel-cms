@@ -1,8 +1,8 @@
 import { Head, Link, router, usePage } from '@inertiajs/react'
-import { ArrowDown, ArrowUp, ExternalLink, Plus, Search, X } from 'lucide-react'
+import { ExternalLink, Plus, Search, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import Paginator from '@/components/Paginator'
-import { Button, Card, Checkbox, Confirm, EmptyState, PageHeader, Segmented, StatusBadge, Tooltip, cn } from '@/components/ui'
+import { Button, Card, Checkbox, Confirm, EmptyState, Kbd, PageHeader, Segmented, StatusBadge, Tooltip } from '@/components/ui'
 import { useDebouncedValue } from '@/hooks/useDebouncedValue'
 import { collectionIcon } from '@/layouts/nav'
 import { formatDate, timeAgo } from '@/lib/format'
@@ -147,14 +147,14 @@ export default function Index({ collection, sortable, filters, entries }: Props)
                         value={search}
                         onChange={(event) => setSearch(event.target.value)}
                         placeholder={`Search ${collection.label.toLowerCase()}`}
-                        className="h-8 w-full rounded-[var(--radius-control)] border border-line bg-panel pr-8 pl-8 text-[13px] shadow-sm placeholder:text-fg-subtle hover:border-line-strong focus:border-accent focus:ring-3 focus:ring-[var(--accent-ring)] focus:outline-none [&::-webkit-search-cancel-button]:hidden"
+                        className="kit-input pr-8 pl-8 [&::-webkit-search-cancel-button]:hidden"
                     />
                     {search !== '' ? (
                         <button type="button" onClick={() => setSearch('')} className="absolute top-1/2 right-2 -translate-y-1/2 rounded p-0.5 text-fg-subtle hover:text-fg" aria-label="Clear search">
                             <X className="size-3.5" />
                         </button>
                     ) : (
-                        <span className="pointer-events-none absolute top-1/2 right-2 -translate-y-1/2 rounded border border-line px-1 text-[10.5px] text-fg-subtle">/</span>
+                        <span className="pointer-events-none absolute top-1/2 right-2 -translate-y-1/2"><Kbd>/</Kbd></span>
                     )}
                 </div>
 
@@ -176,9 +176,9 @@ export default function Index({ collection, sortable, filters, entries }: Props)
                 )}
             </div>
 
-            <Card className="overflow-hidden">
-                {entries.data.length === 0 ? (
-                    filtered ? (
+            {entries.data.length === 0 ? (
+                <Card>
+                    {filtered ? (
                         <EmptyState
                             icon={<Search className="size-5" />}
                             title="Nothing matches"
@@ -192,13 +192,14 @@ export default function Index({ collection, sortable, filters, entries }: Props)
                             description={`Create the first ${singular} and it will appear here.`}
                             action={<Button variant="primary" icon={<Plus className="size-4" />} onClick={() => router.visit(`${base}/new`)}>New {singular}</Button>}
                         />
-                    )
-                ) : (
-                    <div className="overflow-x-auto">
-                        <table className="w-full min-w-[640px] border-collapse text-[13px]">
+                    )}
+                </Card>
+            ) : (
+                    <div className="kit-table-wrap" role="region" aria-label={collection.label} tabIndex={0}>
+                        <table className="kit-table min-w-[640px]">
                             <thead>
-                                <tr className="border-b border-line bg-sunken/60 text-left text-[11.5px] font-medium text-fg-subtle">
-                                    <th className="w-10 py-2 pl-4">
+                                <tr>
+                                    <th className="w-10 !pr-0">
                                         <Checkbox
                                             label="Select all on this page"
                                             checked={selectedOnPage > 0 && selectedOnPage === allOnPage.length}
@@ -215,7 +216,7 @@ export default function Index({ collection, sortable, filters, entries }: Props)
                                     <SortHeader label="Status" column="status" filters={filters} sortable={sortable} onSort={sortBy} className="w-32" />
                                     <SortHeader label="Published" column="published_at" filters={filters} sortable={sortable} onSort={sortBy} className="w-36" />
                                     <SortHeader label="Updated" column="updated_at" filters={filters} sortable={sortable} onSort={sortBy} className="w-32" />
-                                    <th className="w-16" />
+                                    <th className="w-16"><span className="sr-only">Actions</span></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -230,24 +231,25 @@ export default function Index({ collection, sortable, filters, entries }: Props)
                                                 if ((event.target as HTMLElement).closest('a,button,label,input')) return
                                                 router.visit(edit)
                                             }}
-                                            className={cn('group cursor-pointer border-b border-line transition-colors last:border-b-0', isSelected ? 'bg-accent-soft/60' : 'hover:bg-hover/60')}
+                                            aria-selected={isSelected || undefined}
+                                            className="group cursor-pointer"
                                         >
-                                            <td className="py-2.5 pl-4">
+                                            <td className="!pr-0">
                                                 <Checkbox label={`Select ${entry.title || 'untitled'}`} checked={isSelected} onChange={(on) => toggle(entry.id, on)} />
                                             </td>
-                                            <td className="py-2.5 pr-4">
+                                            <td className="max-w-0 w-full">
                                                 <Link href={edit} className="block truncate font-medium text-fg hover:text-accent">
                                                     {entry.title || <span className="text-fg-subtle italic">Untitled</span>}
                                                 </Link>
                                                 <span className="block truncate font-mono text-[11.5px] text-fg-subtle">/{entry.slug}</span>
                                             </td>
-                                            <td className="py-2.5 pr-4"><StatusBadge status={entry.status} /></td>
-                                            <td className="py-2.5 pr-4 text-fg-muted tabular-nums">{formatDate(entry.publishedAt) || <span className="text-fg-subtle">—</span>}</td>
-                                            <td className="py-2.5 pr-4 text-fg-muted" title={formatDate(entry.updatedAt)}>{timeAgo(entry.updatedAt)}</td>
-                                            <td className="py-2.5 pr-3 text-right">
+                                            <td><StatusBadge status={entry.status} /></td>
+                                            <td className="text-fg-muted tabular-nums">{formatDate(entry.publishedAt) || <span className="text-fg-subtle">—</span>}</td>
+                                            <td className="text-fg-muted" title={formatDate(entry.updatedAt)}>{timeAgo(entry.updatedAt)}</td>
+                                            <td className="text-right">
                                                 {entry.url !== null && entry.status === 'published' && (
                                                     <Tooltip content="View on site">
-                                                        <a href={entry.url} target="_blank" rel="noreferrer" className="inline-flex size-7 items-center justify-center rounded-md text-fg-subtle opacity-0 transition-opacity group-hover:opacity-100 hover:bg-selected hover:text-fg focus-visible:opacity-100" aria-label={`View ${entry.title} on site`}>
+                                                        <a href={entry.url} target="_blank" rel="noreferrer" className="kit-button opacity-0 group-hover:opacity-100 focus-visible:opacity-100" data-variant="ghost" data-size="sm" data-icon="" aria-label={`View ${entry.title} on site`}>
                                                             <ExternalLink className="size-3.5" />
                                                         </a>
                                                     </Tooltip>
@@ -259,14 +261,13 @@ export default function Index({ collection, sortable, filters, entries }: Props)
                             </tbody>
                         </table>
                     </div>
-                )}
-            </Card>
+            )}
 
             <Paginator currentPage={entries.currentPage} lastPage={entries.lastPage} onGo={(page) => go({ page: page === 1 ? undefined : String(page) })} />
 
             {/* The bulk bar floats over the page while anything is selected. */}
             {selected.size > 0 && (
-                <div className="fixed bottom-5 left-1/2 z-40 flex -translate-x-1/2 items-center gap-1 rounded-[var(--radius-card)] border border-line bg-elevated p-1.5 pl-3.5 shadow-lg animate-pop">
+                <div className="kit-card fixed bottom-5 left-1/2 z-40 !flex-row -translate-x-1/2 items-center gap-1 p-1.5 pl-3.5 shadow-lg animate-pop">
                     <span className="mr-2 text-[13px] font-medium tabular-nums">{selected.size} selected</span>
                     <Button size="sm" variant="ghost" onClick={() => runBulk('publish')}>Publish</Button>
                     <Button size="sm" variant="ghost" onClick={() => runBulk('unpublish')}>Unpublish</Button>
@@ -295,14 +296,13 @@ export default function Index({ collection, sortable, filters, entries }: Props)
 
 function SortHeader({ label, column, filters, sortable, onSort, className }: { label: string; column: string; filters: Props['filters']; sortable: string[]; onSort: (key: string) => void; className?: string }) {
     const active = filters.sort === column
-    const canSort = sortable.includes(column)
 
+    // kit's sortable header: aria-sort on the cell draws the arrow.
     return (
-        <th className={cn('py-2 pr-4 font-medium', className)} aria-sort={active ? (filters.direction === 'asc' ? 'ascending' : 'descending') : undefined}>
-            {canSort ? (
-                <button type="button" onClick={() => onSort(column)} className={cn('inline-flex items-center gap-1 hover:text-fg', active && 'text-fg')}>
+        <th className={className} aria-sort={active ? (filters.direction === 'asc' ? 'ascending' : 'descending') : undefined}>
+            {sortable.includes(column) ? (
+                <button type="button" className="kit-sort" onClick={() => onSort(column)}>
                     {label}
-                    {active && (filters.direction === 'asc' ? <ArrowUp className="size-3" /> : <ArrowDown className="size-3" />)}
                 </button>
             ) : (
                 label

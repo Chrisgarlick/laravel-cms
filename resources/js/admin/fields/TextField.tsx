@@ -5,7 +5,7 @@ export default function TextField({ field, value, onChange }: FieldProps<string>
         <input
             id={`field-${field.name}`}
             type={field.type === 'url' ? 'url' : 'text'}
-            className="field-input"
+            className="kit-input"
             value={value ?? ''}
             maxLength={field.maxLength ?? undefined}
             required={field.required}

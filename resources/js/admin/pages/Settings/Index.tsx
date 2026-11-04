@@ -122,12 +122,12 @@ export default function Index({ values, defaults, overridden, cache }: Props) {
                                                     <input
                                                         id={`setting-${key}`}
                                                         type="text"
-                                                        className="field-input"
+                                                        className="kit-input"
                                                         value={form.data[key] ?? ''}
                                                         placeholder={defaults[key] ?? 'Not set'}
                                                         onChange={(event) => form.setData(key, event.target.value)}
                                                     />
-                                                    {form.errors[key] !== undefined && <p className="field-error">{form.errors[key]}</p>}
+                                                    {form.errors[key] !== undefined && <p className="kit-field-error">{form.errors[key]}</p>}
                                                     {changed && (
                                                         <button type="button" onClick={() => form.setData(key, '')} className="mt-1.5 inline-flex items-center gap-1 text-[12px] text-fg-subtle hover:text-fg">
                                                             <RotateCcw className="size-3" />

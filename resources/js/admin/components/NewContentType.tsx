@@ -99,7 +99,7 @@ export function NewContentType({ collections }: { collections: Array<{ handle: s
 
     const update = (id: number, changes: Partial<Row>) => setRows((current) => current.map((row) => (row.id === id ? { ...row, ...changes } : row)))
 
-    const input = 'h-8 w-full rounded-[var(--radius-control)] border border-line bg-panel px-2.5 text-[13px] shadow-sm placeholder:text-fg-subtle focus:border-accent focus:ring-3 focus:ring-[var(--accent-ring)] focus:outline-none'
+    const input = 'kit-input'
 
     return (
         <>
@@ -107,7 +107,7 @@ export function NewContentType({ collections }: { collections: Array<{ handle: s
                 New content type
             </Button>
 
-            <Dialog open={open} onOpenChange={setOpen} title="New content type" description="Design it here; one command creates the schema, pages, templates and a test." className="!w-[min(760px,calc(100vw-32px))] !max-h-[84vh] !top-[8vh]">
+            <Dialog open={open} onOpenChange={setOpen} title="New content type" description="Design it here; one command creates the schema, pages, templates and a test." size="lg">
                 <div className="space-y-6">
                     <div className="grid gap-4 sm:grid-cols-2">
                         <label className="block">
@@ -137,7 +137,7 @@ export function NewContentType({ collections }: { collections: Array<{ handle: s
                             {rows.map((row) => (
                                 <div key={row.id} className="grid grid-cols-[1fr_150px_auto_auto] items-center gap-2 rounded-[var(--radius-card)] border border-line bg-sunken/40 p-2">
                                     <input className={input} value={row.name} onChange={(event) => update(row.id, { name: event.target.value })} placeholder="field name" aria-label="Field name" />
-                                    <select className={cn(input, 'field-input !h-8 !min-h-0 !py-0')} value={row.type} onChange={(event) => update(row.id, { type: event.target.value })} aria-label="Field type">
+                                    <select className={'kit-select'} value={row.type} onChange={(event) => update(row.id, { type: event.target.value })} aria-label="Field type">
                                         {TYPES.map((type) => <option key={type.value} value={type.value}>{type.label}</option>)}
                                     </select>
                                     <label className="flex items-center gap-1.5 px-1 text-[12px] text-fg-muted">
@@ -150,7 +150,7 @@ export function NewContentType({ collections }: { collections: Array<{ handle: s
                                     {row.type === 'relation' && (
                                         <div className="col-span-4 flex items-center gap-2 px-1 pb-1 text-[12.5px] text-fg-muted">
                                             Links to
-                                            <select className={cn(input, 'field-input !h-7 !min-h-0 w-48 !py-0')} value={row.target} onChange={(event) => update(row.id, { target: event.target.value })}>
+                                            <select className={'kit-select w-48'} value={row.target} onChange={(event) => update(row.id, { target: event.target.value })}>
                                                 <option value="">Choose…</option>
                                                 {collections.map((c) => <option key={c.handle} value={c.handle}>{c.label}</option>)}
                                             </select>

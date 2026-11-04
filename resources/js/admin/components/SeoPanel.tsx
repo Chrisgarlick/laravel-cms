@@ -23,7 +23,7 @@ export default function SeoPanel({
 }) {
     if (seo === null) {
         return (
-            <section className="panel">
+            <section className="kit-card p-4">
                 <h2 className="panel-title">Search preview</h2>
                 <p className="panel-help">
                     This collection has no public URL, so there is nothing to index.
@@ -36,7 +36,7 @@ export default function SeoPanel({
     const warnings = checks.filter((check) => check.severity === 'warn')
 
     return (
-        <section className="panel">
+        <section className="kit-card p-4">
             <h2 className="panel-title">Search preview</h2>
 
             <div className="serp">

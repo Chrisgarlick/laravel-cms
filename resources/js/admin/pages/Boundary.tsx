@@ -34,7 +34,7 @@ export default function Boundary({ checks }: Props) {
                 resolve correctly against the published base.
             </p>
 
-            <table className="admin-table">
+            <table className="kit-table">
                 <tbody>
                     {checks.map((check) => (
                         <tr key={check.name}>

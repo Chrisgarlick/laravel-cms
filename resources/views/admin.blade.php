@@ -3,7 +3,7 @@
     $vite = app(\Cg\Cms\Admin\AdminVite::class);
 @endphp
 <!DOCTYPE html>
-<html lang="en-GB" data-cg-site="{{ config('cg-cms.site.name') }}">
+<html lang="en-GB" data-cg-site="{{ config('cg-cms.site.name') }}" data-density="compact">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">

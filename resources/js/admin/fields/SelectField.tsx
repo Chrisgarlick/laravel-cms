@@ -4,7 +4,7 @@ export default function SelectField({ field, value, onChange }: FieldProps<strin
     return (
         <select
             id={`field-${field.name}`}
-            className="field-input field-narrow"
+            className="kit-select max-w-xs"
             value={value ?? ''}
             required={field.required}
             onChange={(event) => onChange(event.target.value)}

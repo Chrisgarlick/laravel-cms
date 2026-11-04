@@ -305,20 +305,20 @@ function FieldTable({ fields, showSource = false, showPlacement = false, onSelec
                 <span className="text-[12px] text-fg-subtle">{fields.length} top level</span>
             </div>
             <div className="overflow-x-auto">
-                <table className="w-full min-w-[760px] text-[13px]">
+                <table className="kit-table min-w-[760px] [&_td]:whitespace-normal">
                     <thead>
-                        <tr className="border-b border-line bg-sunken/60 text-left text-[11.5px] font-medium text-fg-subtle">
-                            <th className="py-2 pl-4 font-medium">Field</th>
-                            <th className="py-2 pr-4 font-medium">Type</th>
-                            <th className="py-2 pr-4 font-medium">Rules</th>
-                            <th className="py-2 pr-4 font-medium">{showPlacement ? 'In the editor' : 'Shown'}</th>
-                            <th className="w-20 py-2 pr-3" />
+                        <tr>
+                            <th>Field</th>
+                            <th>Type</th>
+                            <th>Rules</th>
+                            <th>{showPlacement ? 'In the editor' : 'Shown'}</th>
+                            <th className="w-20" />
                         </tr>
                     </thead>
                     <tbody>
                         {rows.map(({ field, depth, path }) => (
-                            <tr key={path} className="group border-b border-line align-top last:border-b-0 hover:bg-hover/50">
-                                <td className="py-2.5 pl-4">
+                            <tr key={path} className="group">
+                                <td>
                                     <div className="flex items-start gap-1.5" style={{ paddingLeft: depth * 18 }}>
                                         {depth > 0 && <CornerDownRight className="mt-0.5 size-3.5 shrink-0 text-fg-subtle" />}
                                         <div className="min-w-0">
@@ -328,13 +328,13 @@ function FieldTable({ fields, showSource = false, showPlacement = false, onSelec
                                         </div>
                                     </div>
                                 </td>
-                                <td className="py-2.5 pr-4"><TypeBadge type={field.type} /></td>
-                                <td className="py-2.5 pr-4">
+                                <td><TypeBadge type={field.type} /></td>
+                                <td>
                                     <div className="flex max-w-xs flex-wrap gap-1">
                                         <Rules field={field} onSelectBlock={onSelectBlock} onSelectGroup={onSelectGroup} />
                                     </div>
                                 </td>
-                                <td className="py-2.5 pr-4 text-[12.5px]">
+                                <td className="text-[12.5px]">
                                     <div className="flex flex-col gap-1">
                                         {showPlacement && depth === 0 && (
                                             <span className="inline-flex items-center gap-1.5 text-fg-muted">
@@ -350,7 +350,7 @@ function FieldTable({ fields, showSource = false, showPlacement = false, onSelec
                                         )}
                                     </div>
                                 </td>
-                                <td className="py-2.5 pr-3 text-right">
+                                <td className="text-right">
                                     <div className="flex justify-end gap-0.5 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
                                         {showSource && field.definedAt && (
                                             <Tooltip content={`${field.definedAt.file}:${field.definedAt.line}`}>

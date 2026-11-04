@@ -13,7 +13,7 @@ export default function LintPanel({ issues, checking }: { issues: LintIssue[]; c
     const warnings = issues.filter((issue) => issue.severity === 'warn')
 
     return (
-        <section className="panel">
+        <section className="kit-card p-4">
             <h2 className="panel-title">
                 Brand voice
                 {checking && <span className="panel-busy"> checking</span>}

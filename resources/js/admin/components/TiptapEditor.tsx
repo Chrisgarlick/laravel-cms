@@ -45,7 +45,7 @@ export default function TiptapEditor({ field, value, onChange }: Props) {
 
         editorProps: {
             attributes: {
-                class: 'field-input field-richtext',
+                class: 'field-richtext',
                 id: `field-${field.name}`,
             },
         },

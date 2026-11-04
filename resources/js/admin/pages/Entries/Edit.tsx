@@ -306,12 +306,12 @@ export default function Edit({ collection, entry, values: initial, revisions, dr
                                         placeholder={`${collection.singular} title`}
                                         onChange={(value) => setValue('title', value)}
                                     />
-                                    {form.errors.title && <p className="field-error">{form.errors.title}</p>}
+                                    {form.errors.title && <p className="kit-field-error">{form.errors.title}</p>}
                                 </div>
                             )}
 
                             {tabs.length > 1 && (
-                                <div role="tablist" className="mb-6 flex gap-5 border-b border-line">
+                                <div role="tablist" className="kit-tablist mb-6">
                                     {tabs.map((name) => (
                                         <button
                                             key={name}
@@ -319,13 +319,10 @@ export default function Edit({ collection, entry, values: initial, revisions, dr
                                             role="tab"
                                             aria-selected={tab === name}
                                             onClick={() => setTab(name)}
-                                            className={cn(
-                                                '-mb-px flex items-center gap-1.5 border-b-2 pb-2.5 text-[13px] font-medium transition-colors',
-                                                tab === name ? 'border-accent text-fg' : 'border-transparent text-fg-muted hover:text-fg',
-                                            )}
+                                            className="inline-flex items-center gap-1.5"
                                         >
                                             {name}
-                                            {errorTabs.has(name) && <span className="size-1.5 rounded-full bg-danger" aria-label="Has errors" />}
+                                            {errorTabs.has(name) && <span className="kit-dot text-danger" aria-label="Has errors" />}
                                         </button>
                                     ))}
                                 </div>
@@ -437,7 +434,7 @@ function InspectorSection({ title, hasError = false, children }: { title: string
         <section className="rounded-[var(--radius-card)] border border-line bg-panel p-4 shadow-sm">
             <h2 className="mb-3 flex items-center gap-1.5 text-[12.5px] font-semibold">
                 {title}
-                {hasError && <span className="size-1.5 rounded-full bg-danger" aria-label="Has errors" />}
+                {hasError && <span className="kit-dot text-danger" aria-label="Has errors" />}
             </h2>
             {children}
         </section>

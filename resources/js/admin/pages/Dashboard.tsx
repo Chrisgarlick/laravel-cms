@@ -67,20 +67,20 @@ export default function Dashboard({ collections, recent, seo, notFound, submissi
             {attention.length > 0 ? (
                 <div className="mb-6 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
                     {attention.map((item) => (
-                        <Link key={item.key} href={item.href} className={cn('group flex items-start gap-3 rounded-[var(--radius-card)] border p-4 shadow-sm transition-shadow hover:shadow-md', item.tone === 'danger' ? 'border-danger/25 bg-danger-soft' : 'border-warning/25 bg-warning-soft')}>
-                            <span className={cn('mt-0.5 [&>svg]:size-4', item.tone === 'danger' ? 'text-danger' : 'text-warning')}>{item.icon}</span>
-                            <span className="min-w-0 flex-1">
-                                <span className="block text-[13.5px] font-semibold">{item.title}</span>
-                                <span className="block text-[12.5px] text-fg-muted">{item.detail}</span>
+                        <Link key={item.key} href={item.href} className="kit-alert group grid-cols-[auto_1fr_auto] transition-shadow hover:shadow-md" data-tone={item.tone === 'danger' ? 'bad' : 'warn'}>
+                            {item.icon}
+                            <span className="min-w-0">
+                                <p className="kit-alert-title">{item.title}</p>
+                                <p>{item.detail}</p>
                             </span>
                             <ArrowRight className="mt-0.5 size-4 text-fg-subtle transition-transform group-hover:translate-x-0.5" />
                         </Link>
                     ))}
                 </div>
             ) : (
-                <div className="mb-6 flex items-center gap-3 rounded-[var(--radius-card)] border border-success/20 bg-success-soft px-4 py-3 text-[13px]">
-                    <CircleCheck className="size-4 text-success" />
-                    <span><span className="font-semibold">All clear.</span> <span className="text-fg-muted">No unsent leads, failed jobs, blocking SEO issues or images missing alt text.</span></span>
+                <div className="kit-alert mb-6" data-tone="good">
+                    <CircleCheck />
+                    <p><span className="font-semibold">All clear.</span> <span className="text-fg-muted">No unsent leads, failed jobs, blocking SEO issues or images missing alt text.</span></p>
                 </div>
             )}
 
@@ -89,7 +89,7 @@ export default function Dashboard({ collections, recent, seo, notFound, submissi
                 <Stat label="Published" icon={<Globe />} value={published} hint={`across ${collections.length} collections`} />
                 <Stat label="Drafts" icon={<PenLine />} value={drafts} hint={drafts === 0 ? 'nothing in progress' : 'not live yet'} />
                 <Stat label="Leads this week" icon={<Inbox />} value={nav?.leads ?? 0} hint={<Deferred data="submissions" fallback={<span>&nbsp;</span>}><span>{submissions?.rejected ?? 0} spam blocked</span></Deferred>} />
-                <Deferred data="cache" fallback={<Card className="p-4"><Skeleton className="h-4 w-20" /><Skeleton className="mt-3 h-7 w-16" /></Card>}>
+                <Deferred data="cache" fallback={<div className="kit-stat"><Skeleton className="h-4 w-20" /><Skeleton className="h-8 w-16" /></div>}>
                     <CacheStat cache={cache} />
                 </Deferred>
             </div>
@@ -218,13 +218,14 @@ function greeting(): string {
     return hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening'
 }
 
+/** kit's stat tile, with the icon chip beside its label. */
 function Stat({ label, icon, value, hint }: { label: string; icon: ReactNode; value: number; hint: ReactNode }) {
     return (
-        <Card className="p-4">
+        <div className="kit-stat">
             <StatLabel icon={icon}>{label}</StatLabel>
-            <div className="mt-3 font-display text-[32px] leading-none font-semibold tracking-[-0.02em] tabular-nums">{value.toLocaleString('en-GB')}</div>
-            <div className="mt-1.5 text-[12px] text-fg-subtle">{hint}</div>
-        </Card>
+            <p className="kit-stat-value">{value.toLocaleString('en-GB')}</p>
+            <p className="kit-stat-note">{hint}</p>
+        </div>
     )
 }
 
@@ -232,21 +233,19 @@ function CacheStat({ cache }: { cache: Props['cache'] }) {
     const warm = cache && cache.publicPages > 0 ? Math.min(100, Math.round((cache.pages / cache.publicPages) * 100)) : 0
 
     return (
-        <Card className="p-4">
+        <div className="kit-stat">
             <StatLabel icon={<Gauge />}>Page cache</StatLabel>
-            <div className="mt-3 font-display text-[32px] leading-none font-semibold tracking-[-0.02em] tabular-nums">{warm}%</div>
-            <div className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-sunken">
-                <div className="h-full rounded-full bg-accent transition-[width] duration-700" style={{ width: `${warm}%` }} />
-            </div>
-            <div className="mt-1.5 text-[12px] text-fg-subtle">{cache?.pages ?? 0} of {cache?.publicPages ?? 0} pages warm</div>
-        </Card>
+            <p className="kit-stat-value">{warm}%</p>
+            <progress className="kit-progress mt-2.5" max={100} value={warm} aria-label="Pages in the cache">{warm}%</progress>
+            <p className="kit-stat-note">{cache?.pages ?? 0} of {cache?.publicPages ?? 0} pages warm</p>
+        </div>
     )
 }
 
 function StatLabel({ icon, children }: { icon: ReactNode; children: ReactNode }) {
     return (
         <div className="flex items-center justify-between gap-2">
-            <span className="text-[12.5px] font-medium text-fg-muted">{children}</span>
+            <span className="kit-stat-label">{children}</span>
             <span className="icon-chip">{icon}</span>
         </div>
     )

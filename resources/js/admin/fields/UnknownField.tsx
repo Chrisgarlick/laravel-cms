@@ -17,7 +17,7 @@ export default function UnknownField({ field, value }: FieldProps<unknown>) {
                 one with <code>registerField(&apos;{field.type}&apos;, Component)</code>.
             </p>
 
-            <p className="field-help">Registered types: {registeredTypes().join(', ')}</p>
+            <p className="kit-field-hint">Registered types: {registeredTypes().join(', ')}</p>
 
             <pre className="field-raw">{JSON.stringify(value, null, 2)}</pre>
         </div>

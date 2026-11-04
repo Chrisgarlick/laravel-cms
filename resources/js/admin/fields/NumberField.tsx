@@ -5,7 +5,7 @@ export default function NumberField({ field, value, onChange }: FieldProps<numbe
         <input
             id={`field-${field.name}`}
             type="number"
-            className="field-input field-narrow"
+            className="kit-input max-w-xs"
             value={value ?? ''}
             required={field.required}
             onChange={(event) => {

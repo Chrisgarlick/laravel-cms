@@ -45,7 +45,7 @@ export default function SeoField({ value, onChange }: FieldProps<Partial<SeoValu
                 Title override
                 <input
                     type="text"
-                    className="field-input"
+                    className="kit-input"
                     value={seo.title}
                     placeholder="Falls back to the collection template"
                     onChange={(event) => set('title', event.target.value)}
@@ -60,7 +60,7 @@ export default function SeoField({ value, onChange }: FieldProps<Partial<SeoValu
             <label className="field-sub">
                 Description override
                 <textarea
-                    className="field-input field-textarea"
+                    className="kit-input"
                     rows={3}
                     value={seo.description}
                     placeholder="Falls back to the summary field, then the site default"
@@ -77,7 +77,7 @@ export default function SeoField({ value, onChange }: FieldProps<Partial<SeoValu
                 Canonical override
                 <input
                     type="url"
-                    className="field-input field-mono"
+                    className="kit-input font-mono"
                     value={seo.canonical}
                     placeholder="Falls back to this entry's own URL"
                     onChange={(event) => set('canonical', event.target.value)}
@@ -88,29 +88,31 @@ export default function SeoField({ value, onChange }: FieldProps<Partial<SeoValu
                 Keywords
                 <input
                     type="text"
-                    className="field-input"
+                    className="kit-input"
                     value={seo.keywords}
                     placeholder="Primary first, then any others, comma separated"
                     onChange={(event) => set('keywords', event.target.value)}
                 />
-                <span className="field-help">
+                <span className="kit-field-hint">
                     The first is checked for in the title, the opening and an h2.
                 </span>
             </label>
 
             <div className="field-robots">
-                <label className="field-check">
+                <label className="kit-choice">
                     <input
                         type="checkbox"
+                        className="kit-checkbox"
                         checked={seo.noindex}
                         onChange={(event) => set('noindex', event.target.checked)}
                     />
                     noindex
                 </label>
 
-                <label className="field-check">
+                <label className="kit-choice">
                     <input
                         type="checkbox"
+                        className="kit-checkbox"
                         checked={seo.nofollow}
                         onChange={(event) => set('nofollow', event.target.checked)}
                     />

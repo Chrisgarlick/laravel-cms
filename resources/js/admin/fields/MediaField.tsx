@@ -97,7 +97,7 @@ export default function MediaField({ field, value, onChange }: FieldProps<MediaV
                         <p className="field-mono">
                             {item?.filename ?? media.src ?? 'Loading'}
                             {media.src !== undefined && media.id === undefined && (
-                                <span className="pill"> not in the library</span>
+                                <span className="kit-badge"> not in the library</span>
                             )}
                         </p>
 
@@ -109,27 +109,27 @@ export default function MediaField({ field, value, onChange }: FieldProps<MediaV
                         )}
 
                         <div className="editor-actions">
-                            <button type="button" className="button-quiet" onClick={() => setPicking(true)}>
+                            <button type="button" className="kit-button" data-size="sm" onClick={() => setPicking(true)}>
                                 Replace
                             </button>
-                            <button type="button" className="button-quiet" onClick={() => onChange(null)}>
+                            <button type="button" className="kit-button" data-size="sm" onClick={() => onChange(null)}>
                                 Remove
                             </button>
                         </div>
                     </div>
                 </div>
             ) : (
-                <button type="button" className="button-quiet" onClick={() => setPicking(true)}>
+                <button type="button" className="kit-button" data-size="sm" onClick={() => setPicking(true)}>
                     Choose an image
                 </button>
             )}
 
             {hasImage && (
                 <label className="field-sub">
-                    Alt text{field.requireAlt && <span className="field-required"> required</span>}
+                    Alt text{field.requireAlt && <span className="kit-field-optional"> required</span>}
                     <input
                         type="text"
-                        className="field-input"
+                        className="kit-input"
                         value={media.alt ?? ''}
                         maxLength={255}
                         required={field.requireAlt}
@@ -146,7 +146,7 @@ export default function MediaField({ field, value, onChange }: FieldProps<MediaV
             )}
 
             {field.preset !== null && (
-                <p className="field-help">Shown as the {field.preset} crop. Set the focal point in the library.</p>
+                <p className="kit-field-hint">Shown as the {field.preset} crop. Set the focal point in the library.</p>
             )}
 
             <MediaPicker open={picking} onClose={() => setPicking(false)} onPick={pick} />

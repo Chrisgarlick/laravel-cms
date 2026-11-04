@@ -233,20 +233,20 @@ export default function Index({ filters, counts, media, selected, limits }: Prop
                 </ul>
             ) : (
                 <Card className="overflow-hidden">
-                    <table className="w-full text-[13px]">
+                    <table className="kit-table">
                         <thead>
-                            <tr className="border-b border-line bg-sunken/60 text-left text-[11.5px] text-fg-subtle">
-                                <th className="py-2 pl-4 font-medium">File</th>
-                                <th className="hidden py-2 pr-4 font-medium md:table-cell">Alt text</th>
-                                <th className="py-2 pr-4 font-medium">Size</th>
-                                <th className="py-2 pr-4 font-medium">Used</th>
-                                <th className="hidden py-2 pr-4 font-medium sm:table-cell">Added</th>
+                            <tr>
+                                <th>File</th>
+                                <th className="hidden md:table-cell">Alt text</th>
+                                <th>Size</th>
+                                <th>Used</th>
+                                <th className="hidden sm:table-cell">Added</th>
                             </tr>
                         </thead>
                         <tbody>
                             {media.data.map((item) => (
-                                <tr key={item.id} onClick={() => visit({ selected: item.id }, ['selected'])} className={cn('cursor-pointer border-b border-line last:border-b-0', selected?.id === item.id ? 'bg-accent-soft/60' : 'hover:bg-hover/60')}>
-                                    <td className="py-2 pl-4">
+                                <tr key={item.id} onClick={() => visit({ selected: item.id }, ['selected'])} aria-selected={selected?.id === item.id || undefined} className="cursor-pointer">
+                                    <td>
                                         <div className="flex items-center gap-3">
                                             <img src={item.thumb} alt="" loading="lazy" className="size-10 shrink-0 rounded-md border border-line object-cover" />
                                             <div className="min-w-0">
@@ -255,10 +255,10 @@ export default function Index({ filters, counts, media, selected, limits }: Prop
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="hidden max-w-xs py-2 pr-4 md:table-cell">{item.alt ? <span className="line-clamp-1 text-fg-muted">{item.alt}</span> : <Badge tone="warning">Missing</Badge>}</td>
-                                    <td className="py-2 pr-4 text-fg-muted tabular-nums">{formatBytes(item.bytes)}</td>
-                                    <td className="py-2 pr-4 text-fg-muted tabular-nums">{item.usage === 0 ? <Badge>Unused</Badge> : item.usage}</td>
-                                    <td className="hidden py-2 pr-4 text-fg-muted sm:table-cell">{timeAgo(item.createdAt)}</td>
+                                    <td className="hidden max-w-xs md:table-cell">{item.alt ? <span className="line-clamp-1 text-fg-muted">{item.alt}</span> : <Badge tone="warning">Missing</Badge>}</td>
+                                    <td className="text-fg-muted tabular-nums">{formatBytes(item.bytes)}</td>
+                                    <td className="text-fg-muted tabular-nums">{item.usage === 0 ? <Badge>Unused</Badge> : item.usage}</td>
+                                    <td className="hidden text-fg-muted sm:table-cell">{timeAgo(item.createdAt)}</td>
                                 </tr>
                             ))}
                         </tbody>
@@ -317,9 +317,7 @@ function UploadTray({ uploads, onClear }: { uploads: Upload[]; onClear: () => vo
                         <span className="min-w-0 flex-1">
                             <span className="block truncate font-medium">{upload.name}</span>
                             {upload.state === 'uploading' || upload.state === 'queued' ? (
-                                <span className="mt-1 block h-1 overflow-hidden rounded-full bg-sunken">
-                                    <span className="block h-full rounded-full bg-accent transition-[width]" style={{ width: `${upload.progress}%` }} />
-                                </span>
+                                <progress className="kit-progress mt-1 h-1" max={100} value={upload.progress} aria-label={`Upload of ${upload.name}`} />
                             ) : (
                                 <span className={cn('block', upload.state === 'failed' ? 'text-danger' : 'text-fg-subtle')}>
                                     {upload.state === 'failed' ? (upload.error ?? 'Failed') : upload.state === 'existing' ? 'Already in the library' : 'Uploaded'}
@@ -390,9 +388,9 @@ function Detail({ media, base, prefix }: { media: Selected; base: string; prefix
                     maxLength={255}
                     placeholder="Describe what the image shows, for someone who cannot see it."
                     onChange={(event) => form.setData('alt', event.target.value)}
-                    className="field-input field-textarea"
+                    className="kit-input"
                 />
-                {form.errors.alt !== undefined && <p className="field-error">{form.errors.alt}</p>}
+                {form.errors.alt !== undefined && <p className="kit-field-error">{form.errors.alt}</p>}
                 <div className="flex items-center justify-between gap-3">
                     <p className="text-[12px] text-fg-subtle">The default wherever this image is used.</p>
                     <Button type="submit" size="sm" variant="primary" loading={form.processing} disabled={!form.isDirty}>Save</Button>
@@ -401,7 +399,7 @@ function Detail({ media, base, prefix }: { media: Selected; base: string; prefix
 
             <div className="flex gap-2">
                 <Button size="sm" icon={<Copy className="size-3.5" />} onClick={copyUrl}>Copy URL</Button>
-                <a href={media.preview} download={media.filename} className="button-quiet !h-7 !text-[12.5px]"><Download className="size-3.5" />Download</a>
+                <a href={media.preview} download={media.filename} className="kit-button" data-size="sm"><Download className="size-3.5" />Download</a>
             </div>
 
             <section>

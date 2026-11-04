@@ -7,7 +7,7 @@ export default function TextareaField({ field, value, onChange }: FieldProps<str
         <>
             <textarea
                 id={`field-${field.name}`}
-                className="field-input field-textarea"
+                className="kit-input"
                 value={value ?? ''}
                 rows={4}
                 maxLength={field.maxLength ?? undefined}

@@ -1,10 +1,12 @@
 import { DropdownMenu } from 'radix-ui'
-import type { ComponentProps, ReactNode } from 'react'
+import { Check } from 'lucide-react'
+import { createContext, useContext, type ComponentProps, type ReactNode } from 'react'
 import { cn } from './cn'
 
 /**
- * Dropdown menus, on Radix for keyboard support, focus return and collision
- * handling. Styled once here; screens only compose.
+ * Dropdown menus: kit's menu list, with Radix doing the keyboard, focus
+ * return and collision handling. kit styles the list's direct buttons, so
+ * every item renders as one (asChild).
  */
 export const Menu = DropdownMenu.Root
 export const MenuTrigger = DropdownMenu.Trigger
@@ -12,60 +14,61 @@ export const MenuTrigger = DropdownMenu.Trigger
 export function MenuContent({ className, align = 'end', sideOffset = 6, ...props }: ComponentProps<typeof DropdownMenu.Content>) {
     return (
         <DropdownMenu.Portal>
-            <DropdownMenu.Content
-                align={align}
-                sideOffset={sideOffset}
-                className={cn(
-                    'z-50 min-w-48 rounded-[var(--radius-card)] border border-line bg-elevated p-1 shadow-lg animate-pop',
-                    className,
-                )}
-                {...props}
-            />
+            <DropdownMenu.Content align={align} sideOffset={sideOffset} className={cn('kit-menu-list', className)} data-open="" {...props} />
         </DropdownMenu.Portal>
     )
 }
 
-export function MenuItem({ className, icon, shortcut, danger, children, ...props }: ComponentProps<typeof DropdownMenu.Item> & { icon?: ReactNode; shortcut?: string; danger?: boolean }) {
+export function MenuItem({ icon, shortcut, danger, children, ...props }: ComponentProps<typeof DropdownMenu.Item> & { icon?: ReactNode; shortcut?: string; danger?: boolean }) {
     return (
-        <DropdownMenu.Item
-            className={cn(
-                'flex h-8 cursor-default select-none items-center gap-2.5 rounded-[5px] px-2 text-[13px] outline-none',
-                'data-[highlighted]:bg-hover data-[disabled]:opacity-50 [&_svg]:size-4 [&_svg]:text-fg-subtle',
-                danger ? 'text-danger [&_svg]:text-danger' : 'text-fg',
-                className,
-            )}
-            {...props}
-        >
-            {icon}
-            <span className="flex-1">{children}</span>
-            {shortcut && <span className="text-[11px] text-fg-subtle">{shortcut}</span>}
+        <DropdownMenu.Item asChild {...props}>
+            <button type="button" data-tone={danger ? 'bad' : undefined}>
+                {icon}
+                <span className="flex-1">{children}</span>
+                {shortcut && <kbd>{shortcut}</kbd>}
+            </button>
         </DropdownMenu.Item>
     )
 }
 
 export function MenuLabel({ children }: { children: ReactNode }) {
-    return <DropdownMenu.Label className="px-2 pt-1.5 pb-1 text-[11px] font-medium text-fg-subtle">{children}</DropdownMenu.Label>
+    return (
+        <DropdownMenu.Label asChild>
+            <p className="kit-menu-label">{children}</p>
+        </DropdownMenu.Label>
+    )
 }
 
 export function MenuSeparator() {
-    return <DropdownMenu.Separator className="-mx-1 my-1 h-px bg-line" />
+    return (
+        <DropdownMenu.Separator asChild>
+            <hr />
+        </DropdownMenu.Separator>
+    )
 }
 
-export const MenuRadioGroup = DropdownMenu.RadioGroup
+/*
+ * Radio items, without Radix's RadioGroup: that renders a wrapping element,
+ * and kit's list styles only its direct children. The group is a context;
+ * each item is a menuitemradio that reports its value.
+ */
+const RadioContext = createContext<{ value: string; onValueChange: (value: string) => void } | null>(null)
 
-export function MenuRadioItem({ className, icon, children, ...props }: ComponentProps<typeof DropdownMenu.RadioItem> & { icon?: ReactNode }) {
+export function MenuRadioGroup({ value, onValueChange, children }: { value: string; onValueChange: (value: string) => void; children: ReactNode }) {
+    return <RadioContext.Provider value={{ value, onValueChange }}>{children}</RadioContext.Provider>
+}
+
+export function MenuRadioItem({ value, icon, children }: { value: string; icon?: ReactNode; children: ReactNode }) {
+    const group = useContext(RadioContext)
+    const checked = group?.value === value
+
     return (
-        <DropdownMenu.RadioItem
-            className={cn(
-                'flex h-8 cursor-default select-none items-center gap-2.5 rounded-[5px] px-2 text-[13px] text-fg outline-none',
-                'data-[highlighted]:bg-hover data-[state=checked]:text-accent [&_svg]:size-4',
-                className,
-            )}
-            {...props}
-        >
-            {icon}
-            <span className="flex-1">{children}</span>
-            <DropdownMenu.ItemIndicator className="size-1.5 rounded-full bg-accent" />
-        </DropdownMenu.RadioItem>
+        <DropdownMenu.Item asChild onSelect={() => group?.onValueChange(value)}>
+            <button type="button" role="menuitemradio" aria-checked={checked}>
+                {icon}
+                <span className="flex-1">{children}</span>
+                {checked && <Check className="!text-accent" aria-hidden />}
+            </button>
+        </DropdownMenu.Item>
     )
 }
