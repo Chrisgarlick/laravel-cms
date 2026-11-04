@@ -59,6 +59,8 @@ export default function Layout({ children }: { children: ReactNode }) {
     useEffect(() => setMobileOpen(false), [url])
 
     const path = url.split('?')[0] ?? url
+    // The editor runs edge to edge (its own sticky bar and inspector); every other screen sits in a column.
+    const fullBleed = /\/(new|edit)$/.test(path)
     const isActive = (href: string) => (href === cms.prefix ? path === href : path === href || path.startsWith(`${href}/`))
 
     const content: NavItem[] = cms.collections.map((collection) => {
@@ -76,10 +78,15 @@ export default function Layout({ children }: { children: ReactNode }) {
         <div className="flex h-full flex-col">
             <div className={cn('flex h-14 shrink-0 items-center gap-2.5', compact ? 'justify-center px-2' : 'px-4')}>
                 <Link href={cms.prefix} className="flex min-w-0 items-center gap-2.5">
-                    <span className="flex size-7 shrink-0 items-center justify-center rounded-[7px] bg-accent text-[13px] font-semibold text-on-accent shadow-sm">
+                    <span className="brand-mark flex size-8 shrink-0 items-center justify-center rounded-[9px] font-display text-[15px] font-semibold text-on-accent">
                         {cms.site.charAt(0)}
                     </span>
-                    {!compact && <span className="truncate text-[13.5px] font-semibold">{cms.site}</span>}
+                    {!compact && (
+                        <span className="min-w-0 leading-tight">
+                            <span className="block truncate font-display text-[15px] font-semibold tracking-[-0.01em]">{cms.site}</span>
+                            <span className="block text-[11px] text-fg-subtle">Content studio</span>
+                        </span>
+                    )}
                 </Link>
             </div>
 
@@ -158,7 +165,10 @@ export default function Layout({ children }: { children: ReactNode }) {
                         </div>
                     </header>
 
-                    <main className="w-full flex-1 animate-in px-4 py-6 md:px-8 md:py-8">{children}</main>
+                    <main className="relative w-full flex-1 animate-in px-4 py-6 md:px-8 md:py-8">
+                        <div className="canvas-glow" aria-hidden />
+                        <div className={cn('relative', !fullBleed && 'mx-auto w-full max-w-[1280px]')}>{children}</div>
+                    </main>
                 </div>
 
                 <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} />
@@ -230,7 +240,7 @@ export default function Layout({ children }: { children: ReactNode }) {
 function SideGroup({ label, compact, children }: { label: string; compact: boolean; children: ReactNode }) {
     return (
         <div>
-            {compact ? <div className="mx-3 mb-2 h-px bg-line" /> : <div className="px-2.5 pb-1.5 text-[11px] font-medium tracking-wide text-fg-subtle">{label}</div>}
+            {compact ? <div className="mx-3 mb-2 h-px bg-line" /> : <div className="px-2.5 pb-1.5 text-[10.5px] font-semibold tracking-[0.08em] text-fg-subtle uppercase">{label}</div>}
             <ul className="space-y-px">{children}</ul>
         </div>
     )
@@ -244,11 +254,12 @@ function SideLink({ item, active, compact }: { item: NavItem; active: boolean; c
             className={cn(
                 'group relative flex h-8 items-center gap-2.5 rounded-[var(--radius-control)] text-[13px] transition-colors',
                 compact ? 'justify-center' : 'px-2.5',
-                active ? 'bg-selected font-medium text-fg' : 'text-fg-muted hover:bg-hover hover:text-fg',
+                active ? 'bg-accent-soft font-medium text-fg' : 'text-fg-muted hover:bg-hover hover:text-fg',
                 '[&>svg]:size-4 [&>svg]:shrink-0',
                 active ? '[&>svg]:text-accent' : '[&>svg]:text-fg-subtle group-hover:[&>svg]:text-fg-muted',
             )}
         >
+            {active && !compact && <span className="absolute top-1.5 bottom-1.5 -left-2 w-[3px] rounded-r-full bg-accent" aria-hidden />}
             {item.icon}
             {!compact && <span className="flex-1 truncate">{item.label}</span>}
             {!compact && item.count !== undefined && item.count > 0 && <span className="text-[11.5px] tabular-nums text-fg-subtle">{item.count}</span>}

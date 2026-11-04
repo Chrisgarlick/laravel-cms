@@ -1,5 +1,5 @@
 import { Deferred, Head, Link, router, usePage } from '@inertiajs/react'
-import { ArrowRight, ArrowRightLeft, ChartColumn, CircleCheck, Image as ImageIcon, Inbox, ListChecks, PenLine, Plus, Zap } from 'lucide-react'
+import { ArrowRight, ArrowRightLeft, ChartColumn, CircleCheck, Gauge, Globe, Image as ImageIcon, Inbox, ListChecks, PenLine, Plus, Zap } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { Badge, Button, Card, Kbd, Skeleton, StatusBadge, cn } from '@/components/ui'
 import { collectionIcon } from '@/layouts/nav'
@@ -46,8 +46,8 @@ export default function Dashboard({ collections, recent, seo, notFound, submissi
 
             <header className="mb-8 flex flex-wrap items-end justify-between gap-4">
                 <div>
-                    <p className="text-[12.5px] text-fg-subtle">{new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
-                    <h1 className="mt-1 text-[26px] leading-tight font-semibold tracking-[-0.025em]">
+                    <p className="text-[11.5px] font-semibold tracking-[0.08em] text-accent uppercase">{new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
+                    <h1 className="mt-1.5 text-[34px] leading-[1.05]">
                         {greeting()}{firstName ? `, ${firstName}` : ''}
                     </h1>
                 </div>
@@ -86,9 +86,9 @@ export default function Dashboard({ collections, recent, seo, notFound, submissi
 
             {/* Numbers */}
             <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
-                <Stat label="Published" value={published} hint={`across ${collections.length} collections`} />
-                <Stat label="Drafts" value={drafts} hint={drafts === 0 ? 'nothing in progress' : 'not live yet'} />
-                <Stat label="Leads this week" value={nav?.leads ?? 0} hint={<Deferred data="submissions" fallback={<span>&nbsp;</span>}><span>{submissions?.rejected ?? 0} spam blocked</span></Deferred>} />
+                <Stat label="Published" icon={<Globe />} value={published} hint={`across ${collections.length} collections`} />
+                <Stat label="Drafts" icon={<PenLine />} value={drafts} hint={drafts === 0 ? 'nothing in progress' : 'not live yet'} />
+                <Stat label="Leads this week" icon={<Inbox />} value={nav?.leads ?? 0} hint={<Deferred data="submissions" fallback={<span>&nbsp;</span>}><span>{submissions?.rejected ?? 0} spam blocked</span></Deferred>} />
                 <Deferred data="cache" fallback={<Card className="p-4"><Skeleton className="h-4 w-20" /><Skeleton className="mt-3 h-7 w-16" /></Card>}>
                     <CacheStat cache={cache} />
                 </Deferred>
@@ -171,11 +171,11 @@ export default function Dashboard({ collections, recent, seo, notFound, submissi
                                 <div className="p-4">
                                     <div className="flex gap-6">
                                         <div>
-                                            <div className={cn('text-[22px] font-semibold tabular-nums', seo.blocking > 0 ? 'text-danger' : 'text-fg')}>{seo.blocking}</div>
+                                            <div className={cn('font-display text-[26px] font-semibold tabular-nums', seo.blocking > 0 ? 'text-danger' : 'text-fg')}>{seo.blocking}</div>
                                             <div className="text-[12px] text-fg-subtle">blocking</div>
                                         </div>
                                         <div>
-                                            <div className={cn('text-[22px] font-semibold tabular-nums', seo.warnings > 0 ? 'text-warning' : 'text-fg')}>{seo.warnings}</div>
+                                            <div className={cn('font-display text-[26px] font-semibold tabular-nums', seo.warnings > 0 ? 'text-warning' : 'text-fg')}>{seo.warnings}</div>
                                             <div className="text-[12px] text-fg-subtle">warnings</div>
                                         </div>
                                     </div>
@@ -218,11 +218,11 @@ function greeting(): string {
     return hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening'
 }
 
-function Stat({ label, value, hint }: { label: string; value: number; hint: ReactNode }) {
+function Stat({ label, icon, value, hint }: { label: string; icon: ReactNode; value: number; hint: ReactNode }) {
     return (
         <Card className="p-4">
-            <div className="text-[12px] font-medium text-fg-subtle">{label}</div>
-            <div className="mt-1.5 text-[26px] leading-none font-semibold tracking-[-0.02em] tabular-nums">{value.toLocaleString('en-GB')}</div>
+            <StatLabel icon={icon}>{label}</StatLabel>
+            <div className="mt-3 font-display text-[32px] leading-none font-semibold tracking-[-0.02em] tabular-nums">{value.toLocaleString('en-GB')}</div>
             <div className="mt-1.5 text-[12px] text-fg-subtle">{hint}</div>
         </Card>
     )
@@ -233,8 +233,8 @@ function CacheStat({ cache }: { cache: Props['cache'] }) {
 
     return (
         <Card className="p-4">
-            <div className="text-[12px] font-medium text-fg-subtle">Page cache</div>
-            <div className="mt-1.5 text-[26px] leading-none font-semibold tracking-[-0.02em] tabular-nums">{warm}%</div>
+            <StatLabel icon={<Gauge />}>Page cache</StatLabel>
+            <div className="mt-3 font-display text-[32px] leading-none font-semibold tracking-[-0.02em] tabular-nums">{warm}%</div>
             <div className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-sunken">
                 <div className="h-full rounded-full bg-accent transition-[width] duration-700" style={{ width: `${warm}%` }} />
             </div>
@@ -243,11 +243,20 @@ function CacheStat({ cache }: { cache: Props['cache'] }) {
     )
 }
 
+function StatLabel({ icon, children }: { icon: ReactNode; children: ReactNode }) {
+    return (
+        <div className="flex items-center justify-between gap-2">
+            <span className="text-[12.5px] font-medium text-fg-muted">{children}</span>
+            <span className="icon-chip">{icon}</span>
+        </div>
+    )
+}
+
 function Panel({ title, icon, href, children }: { title: string; icon: ReactNode; href?: string; children: ReactNode }) {
     return (
         <Card className="overflow-hidden">
-            <div className="flex items-center justify-between border-b border-line px-4 py-3">
-                <h2 className="flex items-center gap-2 text-[13px] font-semibold [&>svg]:size-4 [&>svg]:text-fg-subtle">{icon}{title}</h2>
+            <div className="flex items-center justify-between border-b border-line px-4 py-2.5">
+                <h2 className="flex items-center gap-2.5 text-[13.5px] font-semibold"><span className="icon-chip">{icon}</span>{title}</h2>
                 {href && (
                     <Link href={href} className="inline-flex items-center gap-1 text-[12px] font-medium text-fg-muted hover:text-fg">
                         View all <ArrowRight className="size-3" />

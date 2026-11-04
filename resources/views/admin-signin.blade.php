@@ -27,12 +27,12 @@
     <main class="grid min-h-dvh lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
         <section class="flex flex-col px-6 py-8 sm:px-12">
             <div class="flex items-center gap-2.5">
-                <span class="flex size-8 items-center justify-center rounded-[8px] bg-accent text-[14px] font-semibold text-on-accent shadow-sm">{{ mb_substr($site, 0, 1) }}</span>
-                <span class="text-[14px] font-semibold">{{ $site }}</span>
+                <span class="brand-mark flex size-9 items-center justify-center rounded-[10px] font-display text-[16px] font-semibold text-on-accent">{{ mb_substr($site, 0, 1) }}</span>
+                <span class="font-display text-[16px] font-semibold tracking-[-0.01em]">{{ $site }}</span>
             </div>
 
             <div class="mx-auto flex w-full max-w-[360px] flex-1 flex-col justify-center py-12">
-                <h1 class="text-[26px] leading-tight font-semibold tracking-[-0.025em]">Welcome back</h1>
+                <h1 class="text-[34px] leading-[1.05]">Welcome back</h1>
                 <p class="mt-1.5 text-[14px] text-fg-muted">Sign in to manage {{ $site }}.</p>
 
                 @if (session('error'))
@@ -63,7 +63,7 @@
                         Stay signed in on this device
                     </label>
 
-                    <button type="submit" class="flex h-10 w-full items-center justify-center rounded-[var(--radius-control)] bg-accent text-[14px] font-medium text-on-accent shadow-sm transition-colors hover:bg-accent-hover focus-visible:ring-3 focus-visible:ring-[var(--accent-ring)] focus-visible:outline-none">
+                    <button type="submit" class="flex h-10 w-full items-center justify-center rounded-[var(--radius-control)] bg-accent text-[14px] font-medium text-on-accent shadow-[inset_0_1px_0_rgb(255_255_255/0.18),var(--shadow-sm)] transition-colors hover:bg-accent-hover focus-visible:ring-3 focus-visible:ring-[var(--accent-ring)] focus-visible:outline-none">
                         Sign in
                     </button>
                 </form>
@@ -73,9 +73,9 @@
         </section>
 
         {{-- Brand panel: decoration only, hidden on small screens. --}}
-        <aside class="relative hidden overflow-hidden bg-[#0b0b0c] lg:block" aria-hidden="true">
-            <div class="absolute -top-40 -right-40 size-[640px] rounded-full bg-[#ff5a1f] opacity-40 blur-[140px]"></div>
-            <div class="absolute -bottom-48 -left-24 size-[520px] rounded-full bg-[#ff8a3d] opacity-20 blur-[120px]"></div>
+        <aside class="relative hidden overflow-hidden bg-[#0b0d10] lg:block" aria-hidden="true">
+            <div class="absolute -top-40 -right-40 size-[640px] rounded-full bg-[#2dd4bf] opacity-30 blur-[140px]"></div>
+            <div class="absolute -bottom-48 -left-24 size-[520px] rounded-full bg-[#4f46e5] opacity-30 blur-[120px]"></div>
             <div class="absolute inset-0 bg-[linear-gradient(rgb(255_255_255/0.04)_1px,transparent_1px),linear-gradient(90deg,rgb(255_255_255/0.04)_1px,transparent_1px)] bg-[size:48px_48px] [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_75%)]"></div>
 
             <div class="relative flex h-full flex-col justify-end p-14">
@@ -90,11 +90,11 @@
                         <div class="h-2.5 w-4/6 rounded bg-white/10"></div>
                     </div>
                     <div class="mt-5 flex items-center justify-between">
-                        <span class="inline-flex h-5 items-center gap-1.5 rounded-full bg-[#3fbf74]/15 px-2 text-[11px] font-medium text-[#3fbf74]"><span class="size-1.5 rounded-full bg-current"></span>Published</span>
-                        <span class="h-7 w-20 rounded-md bg-[#ff5a1f]"></span>
+                        <span class="inline-flex h-5 items-center gap-1.5 rounded-full bg-[#4ade80]/15 px-2 text-[11px] font-medium text-[#4ade80]"><span class="size-1.5 rounded-full bg-current"></span>Published</span>
+                        <span class="h-7 w-20 rounded-[8px] bg-[#2dd4bf]"></span>
                     </div>
                 </div>
-                <p class="max-w-md text-[28px] leading-[1.2] font-semibold tracking-[-0.025em] text-white">Write it, check it, publish it. Served from disk in milliseconds.</p>
+                <p class="max-w-md font-display text-[32px] leading-[1.15] font-semibold tracking-[-0.02em] text-white">Write it, check it, publish it. Served from disk in milliseconds.</p>
                 <p class="mt-3 text-[14px] text-white/50">{{ $site }} · content management</p>
             </div>
         </aside>

@@ -72,22 +72,22 @@ export default function Index({ rule, summary, issues, total, limit, auditedAt }
             <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
                 <Card className="p-4">
                     <div className="text-[12px] font-medium text-fg-subtle">Blocking</div>
-                    <div className={cn('mt-1.5 text-[26px] leading-none font-semibold tabular-nums', blocking > 0 && 'text-danger')}>{blocking}</div>
+                    <div className={cn('mt-1.5 font-display text-[28px] leading-none font-semibold tabular-nums', blocking > 0 && 'text-danger')}>{blocking}</div>
                     <div className="mt-1.5 text-[12px] text-fg-subtle">fix before publishing more</div>
                 </Card>
                 <Card className="p-4">
                     <div className="text-[12px] font-medium text-fg-subtle">Warnings</div>
-                    <div className={cn('mt-1.5 text-[26px] leading-none font-semibold tabular-nums', warnings > 0 && 'text-warning')}>{warnings}</div>
+                    <div className={cn('mt-1.5 font-display text-[28px] leading-none font-semibold tabular-nums', warnings > 0 && 'text-warning')}>{warnings}</div>
                     <div className="mt-1.5 text-[12px] text-fg-subtle">worth a look</div>
                 </Card>
                 <Card className="p-4">
                     <div className="text-[12px] font-medium text-fg-subtle">Pages affected</div>
-                    <div className="mt-1.5 text-[26px] leading-none font-semibold tabular-nums">{pages.length}{total > issues.length ? '+' : ''}</div>
+                    <div className="mt-1.5 font-display text-[28px] leading-none font-semibold tabular-nums">{pages.length}{total > issues.length ? '+' : ''}</div>
                     <div className="mt-1.5 text-[12px] text-fg-subtle">{rule ? `for ${rule}` : 'across every rule'}</div>
                 </Card>
                 <Card className="p-4">
                     <div className="text-[12px] font-medium text-fg-subtle">Rules triggered</div>
-                    <div className="mt-1.5 text-[26px] leading-none font-semibold tabular-nums">{summary.length}</div>
+                    <div className="mt-1.5 font-display text-[28px] leading-none font-semibold tabular-nums">{summary.length}</div>
                     <div className="mt-1.5 text-[12px] text-fg-subtle">of the checks run</div>
                 </Card>
             </div>

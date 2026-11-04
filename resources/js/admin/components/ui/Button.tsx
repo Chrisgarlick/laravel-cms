@@ -6,7 +6,7 @@ type Variant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'subtle'
 type Size = 'sm' | 'md' | 'icon' | 'icon-sm'
 
 const variants: Record<Variant, string> = {
-    primary: 'bg-accent text-on-accent shadow-sm hover:bg-accent-hover active:translate-y-px',
+    primary: 'bg-accent text-on-accent shadow-[inset_0_1px_0_rgb(255_255_255/0.18),var(--shadow-sm)] hover:bg-accent-hover active:translate-y-px',
     secondary: 'bg-panel text-fg border border-line shadow-sm hover:bg-hover hover:border-line-strong',
     ghost: 'text-fg-muted hover:bg-hover hover:text-fg',
     subtle: 'bg-sunken text-fg hover:bg-hover',
@@ -29,7 +29,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 /**
  * The one button. Five variants, one primary per screen (the plan's "calm"
- * rule): primary is Ember, everything else stays neutral.
+ * rule): primary is kit's accent, everything else stays neutral.
  */
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
     { variant = 'secondary', size = 'md', loading = false, icon, className, children, disabled, type = 'button', ...props },

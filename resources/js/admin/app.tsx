@@ -60,6 +60,6 @@ void createInertiaApp({
     progress: {
         // The admin runs on the same box as the site. A visible progress bar
         // is how an editor tells "saving" from "nothing happened".
-        color: '#ff5a1f',
+        color: getComputedStyle(document.documentElement).getPropertyValue('--kit-accent').trim() || '#0f766e',
     },
 })

@@ -427,7 +427,7 @@ function TitleInput({ value, maxLength, placeholder, onChange }: { value: string
             maxLength={maxLength}
             placeholder={placeholder}
             onChange={(event) => onChange(event.target.value.replace(/\n/g, ''))}
-            className="w-full resize-none overflow-hidden bg-transparent text-[26px] leading-[1.15] font-semibold tracking-[-0.025em] text-fg outline-none placeholder:text-fg-subtle/70 focus-visible:outline-none md:text-[32px]"
+            className="w-full resize-none overflow-hidden bg-transparent font-display text-[28px] leading-[1.12] font-semibold tracking-[-0.02em] text-fg outline-none placeholder:text-fg-subtle/70 focus-visible:outline-none md:text-[38px]"
         />
     )
 }
