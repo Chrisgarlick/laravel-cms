@@ -18,6 +18,7 @@ use Cg\Cms\Console\AdminAssetsCommand;
 use Cg\Cms\Console\Content;
 use Cg\Cms\Console\ExportNginxRedirectsCommand;
 use Cg\Cms\Console\FlushCacheCommand;
+use Cg\Cms\Console\KitAssetsCommand;
 use Cg\Cms\Console\MakeBlockCommand;
 use Cg\Cms\Console\MakeCollectionCommand;
 use Cg\Cms\Console\PruneCacheCommand;
@@ -400,6 +401,7 @@ final class CgCmsServiceProvider extends ServiceProvider
                 ExportNginxRedirectsCommand::class,
                 PruneCacheCommand::class,
                 AdminAssetsCommand::class,
+                KitAssetsCommand::class,
                 SeoAuditCommand::class,
                 SecurityAuditCommand::class,
                 UserCommand::class,
