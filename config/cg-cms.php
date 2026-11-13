@@ -356,6 +356,15 @@ return [
             'og' => ['width' => 1200, 'height' => 630],
             'thumb' => ['width' => 200, 'height' => 200],
             'full' => ['width' => 1600, 'height' => null],
+
+            // Named as kit's sections name their images (a schema's `sizes`),
+            // so a kit block's image comes in a variant of its own size. Width
+            // only: each section crops with CSS (aspect-ratio and object-fit)
+            // and its variants crop differently, so a fixed crop here would
+            // be cropped twice. Kit's `card` images use `card` above.
+            'hero' => ['width' => 1600, 'height' => null],
+            'half' => ['width' => 1200, 'height' => null],
+            'product' => ['width' => 1200, 'height' => null],
         ],
     ],
 
