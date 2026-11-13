@@ -46,12 +46,30 @@ final class BlockPreview
         return $this->renderer->render(array_values($blocks), $rendered);
     }
 
-    /** The body inside a document carrying the site's stylesheet. */
+    /**
+     * The body inside a document carrying the site's stylesheet.
+     *
+     * The blocks render first and the document after, but as one render as
+     * far as Blade is concerned: what a block pushes (a kit block pushes its
+     * section's CSS onto `kit-styles`) is still there when the document's
+     * head prints the stack. Rendered separately, Blade would flush the stacks
+     * between the two and the preview would lose the section's CSS.
+     */
     public function document(array $blocks): string
     {
         $view = View::exists('cms.block-preview') ? 'cms.block-preview' : 'cgcms::block-preview';
+        $factory = View::getFacadeRoot();
 
-        return View::make($view, ['body' => $this->body($blocks)])->render();
+        $factory->incrementRender();
+
+        try {
+            $body = $this->body($blocks);
+
+            return View::make($view, ['body' => $body])->render();
+        } finally {
+            $factory->decrementRender();
+            $factory->flushStateIfDoneRendering();
+        }
     }
 
     /**

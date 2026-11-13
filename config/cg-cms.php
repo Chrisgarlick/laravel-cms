@@ -58,6 +58,11 @@ return [
     // See KIT-BLOCKS.md.
     'site_schema' => env('CG_SITE_SCHEMA'),
 
+    // Stylesheets the admin's block previews load besides the site's own, in
+    // order: kit's kit.css for kit blocks (each kit block adds its section's
+    // CSS itself). Printed by the cgcms::preview-styles view.
+    'preview_styles' => [],
+
     // The colours a Columns block's column may wear (its tint select).
     'block_tints' => ['workflow', 'agents', 'data', 'engineering'],
 
