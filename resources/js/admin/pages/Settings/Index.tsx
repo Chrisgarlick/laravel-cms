@@ -1,7 +1,10 @@
 import { Head, router, useForm, usePage } from '@inertiajs/react'
-import { Database, FileCode2, Globe, IdCard, RotateCcw, Search } from 'lucide-react'
+import { Building2, Database, FileCode2, Globe, IdCard, RotateCcw, Search } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
 import { Button, Card, Confirm, PageHeader, cn } from '@/components/ui'
+import FieldRenderer from '@/fields/FieldRenderer'
+import { initialValue } from '@/fields/defaults'
+import type { FieldSchema } from '@/fields/types'
 import { useUnsavedGuard } from '@/hooks/useUnsavedGuard'
 import { timeAgo } from '@/lib/format'
 import type { SharedProps } from '@/types'
@@ -10,6 +13,8 @@ interface Props {
     values: Record<string, string | null>
     defaults: Record<string, string | null>
     overridden: string[]
+    /** The site schema's fields (cg-cms.site_schema), edited with the block field types. */
+    siteDetails: { fields: FieldSchema[]; values: Record<string, unknown> }
     cache: { pages: number; bytes: number; oldest: string | null }
 }
 
@@ -69,12 +74,28 @@ const GROUPS: Group[] = [
  * that change how the application is wired are deliberately absent; a
  * settings screen that can repoint the database can take the site down.
  */
-export default function Index({ values, defaults, overridden, cache }: Props) {
+export default function Index({ values, defaults, overridden, siteDetails, cache }: Props) {
     const { cms } = usePage<SharedProps>().props
     const base = `${cms.prefix}/settings`
     const [confirmFlush, setConfirmFlush] = useState(false)
 
-    const form = useForm<Record<string, string>>(Object.fromEntries(Object.entries(values).map(([key, value]) => [key, value ?? ''])))
+    const hasDetails = siteDetails.fields.length > 0
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- as the entry editor: Inertia's form type has no `unknown`
+    const form = useForm<Record<string, any>>({
+        ...Object.fromEntries(Object.entries(values).map(([key, value]) => [key, value ?? ''])),
+        ...(hasDetails
+            ? { site_details: Object.fromEntries(siteDetails.fields.map((field) => [field.name, siteDetails.values[field.name] ?? initialValue(field)])) }
+            : {}),
+    })
+    const details = (form.data.site_details ?? {}) as Record<string, unknown>
+    const errors = form.errors as Record<string, string | undefined>
+
+    // A field's own error, or the first one inside it (a profile's address).
+    const detailError = (name: string): string | undefined => {
+        const key = `site_details.${name}`
+
+        return errors[key] ?? Object.entries(errors).find(([k]) => k.startsWith(`${key}.`))?.[1]
+    }
 
     useUnsavedGuard(form.isDirty)
 
@@ -89,7 +110,7 @@ export default function Index({ values, defaults, overridden, cache }: Props) {
             <div className="grid gap-8 lg:grid-cols-[200px_minmax(0,1fr)]">
                 <nav className="hidden lg:block" aria-label="Settings sections">
                     <ul className="sticky top-20 space-y-px">
-                        {[...GROUPS, { id: 'cache', title: 'Cache and files', icon: <Database /> }].map((group) => (
+                        {[...GROUPS.slice(0, 1), ...(hasDetails ? [{ id: 'details', title: 'Site details', icon: <Building2 /> }] : []), ...GROUPS.slice(1), { id: 'cache', title: 'Cache and files', icon: <Database /> }].map((group) => (
                             <li key={group.id}>
                                 <a href={`#${group.id}`} className="flex h-8 items-center gap-2.5 rounded-[var(--radius-control)] px-2.5 text-[13px] text-fg-muted hover:bg-hover hover:text-fg [&>svg]:size-4 [&>svg]:text-fg-subtle">
                                     {group.icon}
@@ -102,45 +123,69 @@ export default function Index({ values, defaults, overridden, cache }: Props) {
 
                 <div className="max-w-3xl space-y-6 pb-24">
                     {GROUPS.map((group) => (
-                        <Card key={group.id} className="scroll-mt-20 overflow-hidden">
-                            <section id={group.id}>
-                                <header className="border-b border-line px-5 py-4">
-                                    <h2 className="text-[14px] font-semibold">{group.title}</h2>
-                                    {group.note && <p className="mt-0.5 text-[12.5px] text-fg-muted">{group.note}</p>}
-                                </header>
-                                <div className="divide-y divide-line">
-                                    {group.keys.map(([key, label, hint]) => {
-                                        const changed = overridden.includes(key)
+                        <div key={group.id} className="space-y-6">
+                            <Card className="scroll-mt-20 overflow-hidden">
+                                <section id={group.id}>
+                                    <header className="border-b border-line px-5 py-4">
+                                        <h2 className="text-[14px] font-semibold">{group.title}</h2>
+                                        {group.note && <p className="mt-0.5 text-[12.5px] text-fg-muted">{group.note}</p>}
+                                    </header>
+                                    <div className="divide-y divide-line">
+                                        {group.keys.map(([key, label, hint]) => {
+                                            const changed = overridden.includes(key)
 
-                                        return (
-                                            <div key={key} className="grid gap-2 px-5 py-4 sm:grid-cols-[200px_minmax(0,1fr)] sm:gap-6">
-                                                <div>
-                                                    <label htmlFor={`setting-${key}`} className="text-[13px] font-medium">{label}</label>
-                                                    {hint && <p className="mt-0.5 text-[12px] text-fg-subtle">{hint}</p>}
+                                            return (
+                                                <div key={key} className="grid gap-2 px-5 py-4 sm:grid-cols-[200px_minmax(0,1fr)] sm:gap-6">
+                                                    <div>
+                                                        <label htmlFor={`setting-${key}`} className="text-[13px] font-medium">{label}</label>
+                                                        {hint && <p className="mt-0.5 text-[12px] text-fg-subtle">{hint}</p>}
+                                                    </div>
+                                                    <div>
+                                                        <input
+                                                            id={`setting-${key}`}
+                                                            type="text"
+                                                            className="kit-input"
+                                                            value={String(form.data[key] ?? '')}
+                                                            placeholder={defaults[key] ?? 'Not set'}
+                                                            onChange={(event) => form.setData(key, event.target.value)}
+                                                        />
+                                                        {errors[key] !== undefined && <p className="kit-field-error">{errors[key]}</p>}
+                                                        {changed && (
+                                                            <button type="button" onClick={() => form.setData(key, '')} className="mt-1.5 inline-flex items-center gap-1 text-[12px] text-fg-subtle hover:text-fg">
+                                                                <RotateCcw className="size-3" />
+                                                                Changed from the default. Reset{defaults[key] ? ` to "${truncate(defaults[key] ?? '', 40)}"` : ''}
+                                                            </button>
+                                                        )}
+                                                    </div>
                                                 </div>
-                                                <div>
-                                                    <input
-                                                        id={`setting-${key}`}
-                                                        type="text"
-                                                        className="kit-input"
-                                                        value={form.data[key] ?? ''}
-                                                        placeholder={defaults[key] ?? 'Not set'}
-                                                        onChange={(event) => form.setData(key, event.target.value)}
-                                                    />
-                                                    {form.errors[key] !== undefined && <p className="kit-field-error">{form.errors[key]}</p>}
-                                                    {changed && (
-                                                        <button type="button" onClick={() => form.setData(key, '')} className="mt-1.5 inline-flex items-center gap-1 text-[12px] text-fg-subtle hover:text-fg">
-                                                            <RotateCcw className="size-3" />
-                                                            Changed from the default. Reset{defaults[key] ? ` to "${truncate(defaults[key] ?? '', 40)}"` : ''}
-                                                        </button>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        )
-                                    })}
-                                </div>
-                            </section>
-                        </Card>
+                                            )
+                                        })}
+                                    </div>
+                                </section>
+                            </Card>
+                            {group.id === 'site' && hasDetails && (
+                                <Card className="scroll-mt-20 overflow-hidden">
+                                    <section id="details">
+                                        <header className="border-b border-line px-5 py-4">
+                                            <h2 className="text-[14px] font-semibold">Site details</h2>
+                                            <p className="mt-0.5 text-[12.5px] text-fg-muted">Entered once. The site&apos;s sections show them wherever a block leaves its own empty: the header&apos;s phone number, the footer&apos;s small print.</p>
+                                        </header>
+                                        <div className="space-y-5 px-5 py-4">
+                                            {siteDetails.fields.map((field) => (
+                                                <FieldRenderer
+                                                    key={field.name}
+                                                    field={field}
+                                                    value={details[field.name]}
+                                                    values={details}
+                                                    error={detailError(field.name)}
+                                                    onChange={(name, next) => form.setData('site_details', { ...details, [name]: next })}
+                                                />
+                                            ))}
+                                        </div>
+                                    </section>
+                                </Card>
+                            )}
+                        </div>
                     ))}
 
                     <Card className="scroll-mt-20 overflow-hidden">

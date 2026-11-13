@@ -6,8 +6,10 @@ namespace Cg\Cms\Http\Controllers\Admin;
 
 use Cg\Cms\Cache\CachePurger;
 use Cg\Cms\Models\PageCacheEntry;
+use Cg\Cms\Schema\Field;
 use Cg\Cms\Seo\SeoFileWriter;
 use Cg\Cms\Settings\Settings;
+use Cg\Cms\Settings\SiteSchema;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -78,7 +80,52 @@ final class SettingsController
             $rules[str_replace('.', '\.', $key)] = $rule;
         }
 
+        // The site schema's fields, posted together under `site_details` and
+        // validated by the same Field rules as a block's (alt text, list
+        // limits, a profile's address).
+        foreach ($this->siteFields() as $field) {
+            $rules['site_details.'.$field->name] = $field->validationRules('site_details');
+            $rules = [...$rules, ...$field->nestedValidationRules('site_details')];
+        }
+
         return $rules;
+    }
+
+    /**
+     * The site schema's fields that are not already settings of cg-cms's own
+     * (its `name` is `site.name`, edited under "Site").
+     *
+     * @return array<int, Field>
+     */
+    private function siteFields(): array
+    {
+        $own = array_keys($this->editable());
+
+        return array_values(array_filter(
+            app(SiteSchema::class)->fields(),
+            fn (Field $field): bool => ! in_array('site.'.$field->name, $own, true),
+        ));
+    }
+
+    /**
+     * A site detail as stored: an empty list, or an image with nothing chosen,
+     * is no value, so the row is removed and config shows through.
+     */
+    private function siteValue(Field $field, mixed $value): mixed
+    {
+        if ($field->type === 'media') {
+            return is_array($value) && (($value['id'] ?? '') !== '' || ($value['src'] ?? '') !== '') ? $value : null;
+        }
+
+        if (is_array($value) && $value === []) {
+            return null;
+        }
+
+        if (is_string($value)) {
+            $value = trim($value);
+        }
+
+        return $value;
     }
 
     public function index(Settings $settings): Response
@@ -91,19 +138,43 @@ final class SettingsController
             $defaults[$key] = config('cg-cms.'.$key);
         }
 
+        $siteFields = $this->siteFields();
+        $siteValues = [];
+
+        foreach ($siteFields as $field) {
+            $siteValues[$field->name] = $settings->get('site.'.$field->name) ?? $field->defaultValue();
+        }
+
         return Inertia::render('Settings/Index', [
             'values' => $values,
             'defaults' => $defaults,
+            'siteDetails' => [
+                'fields' => array_map(fn (Field $field): array => [...$field->toArray(), 'native' => false], $siteFields),
+                'values' => (object) $siteValues,
+            ],
             'overridden' => array_keys($settings->all()),
             'cache' => fn (): array => $this->cacheStats(),
         ]);
     }
 
-    public function update(Request $request, Settings $settings, SeoFileWriter $files): RedirectResponse
+    public function update(Request $request, Settings $settings, SeoFileWriter $files, CachePurger $purger): RedirectResponse
     {
         $validated = $request->validate($this->rules());
+        $details = (array) ($validated['site_details'] ?? []);
+        unset($validated['site_details']);
+
+        foreach ($this->siteFields() as $field) {
+            if (array_key_exists($field->name, $details)) {
+                $validated['site.'.$field->name] = $this->siteValue($field, $details[$field->name]);
+            }
+        }
 
         $settings->put($validated);
+
+        // Pages that showed the site's details (kit's header and footer, a
+        // call to action with the phone number) registered SITE_TAG when they
+        // rendered. They are out of date now; nothing else is.
+        $purger->purgeTags([Settings::SITE_TAG]);
 
         // The machine-readable files embed several of these directly:
         // robots.txt carries the sitemap URL built from the domain, llms.txt

@@ -22,10 +22,10 @@ use Cg\Cms\Console\MakeBlockCommand;
 use Cg\Cms\Console\MakeCollectionCommand;
 use Cg\Cms\Console\PruneCacheCommand;
 use Cg\Cms\Console\SecurityAuditCommand;
-use Cg\Cms\Console\UserCommand;
 use Cg\Cms\Console\SeoAuditCommand;
 use Cg\Cms\Console\SeoFilesCommand;
 use Cg\Cms\Console\SyncSchemaCommand;
+use Cg\Cms\Console\UserCommand;
 use Cg\Cms\Console\WarmCacheCommand;
 use Cg\Cms\Content\EntryObserver;
 use Cg\Cms\Content\TiptapRenderer;
@@ -51,6 +51,7 @@ use Cg\Cms\Seo\JsonLd;
 use Cg\Cms\Seo\SeoFileWriter;
 use Cg\Cms\Seo\SeoResolver;
 use Cg\Cms\Settings\Settings;
+use Cg\Cms\Settings\SiteSchema;
 use Cg\Cms\View\Components\Blocks;
 use Cg\Cms\View\Components\Image;
 use Cg\Cms\View\Components\Seo;
@@ -126,6 +127,9 @@ final class CgCmsServiceProvider extends ServiceProvider
         // One instance per request, so the settings table is read at most once
         // even though several services ask for it while building a page head.
         $this->app->singleton(Settings::class);
+        $this->app->singleton(SiteSchema::class, fn (): SiteSchema => new SiteSchema(
+            config('cg-cms.site_schema') === null ? null : (string) config('cg-cms.site_schema'),
+        ));
 
         // Rule set and severities come from config, so a site can retune the
         // brand voice without touching a rule.

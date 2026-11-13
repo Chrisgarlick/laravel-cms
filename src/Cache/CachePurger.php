@@ -51,6 +51,34 @@ final class CachePurger
     }
 
     /**
+     * Purge every cached page whose render registered one of these tags.
+     *
+     * For changes that are not an entry: saving the site's details purges
+     * the pages that showed them (Settings::SITE_TAG). Same disk, CDN and
+     * warming steps as purge().
+     *
+     * @param  array<int, string>  $tags
+     * @return array<int, string> The URLs purged.
+     */
+    public function purgeTags(array $tags): array
+    {
+        $urls = $this->urlsForTags($tags);
+
+        if ($urls === []) {
+            return [];
+        }
+
+        $this->cache->forgetMany($urls);
+        $this->purgeCdn($urls);
+
+        if (config('cg-cms.page_cache.warm_after_purge')) {
+            WarmPageCache::dispatch($urls);
+        }
+
+        return $urls;
+    }
+
+    /**
      * @param  array<int, string>  $tags
      * @return array<int, string>
      */

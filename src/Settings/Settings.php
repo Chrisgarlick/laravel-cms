@@ -32,6 +32,14 @@ final class Settings
 {
     public const CACHE_KEY = 'cms:settings';
 
+    /**
+     * The page cache tag of a render that showed site details.
+     *
+     * Registered by whatever prints them (kit's blocks do, through
+     * CacheContext); saving the settings purges every page carrying it.
+     */
+    public const SITE_TAG = 'settings:site';
+
     /** @var array<string, mixed>|null */
     private ?array $loaded = null;
 
@@ -51,6 +59,27 @@ final class Settings
         }
 
         return config('cg-cms.'.$key, $default);
+    }
+
+    /**
+     * The site's details: every field of the site schema (cg-cms.site_schema),
+     * keyed by its name, from the `site.<name>` setting or config behind it.
+     *
+     * Stored values as they are: an image is the media field's {id, alt},
+     * which the caller resolves (kit through MediaResolver). Empty without a
+     * site schema.
+     *
+     * @return array<string, mixed>
+     */
+    public function site(): array
+    {
+        $site = [];
+
+        foreach (app(SiteSchema::class)->names() as $name) {
+            $site[$name] = $this->get('site.'.$name);
+        }
+
+        return $site;
     }
 
     /**

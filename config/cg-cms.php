@@ -51,6 +51,13 @@ return [
     // `php artisan cms:block` creates it.
     'blocks_path' => base_path('app/Cms/blocks.php'),
 
+    // More site details, from a JSON schema of fields: kit's
+    // <kit-blocks>/kit/site.schema.json (phone, logo, socials, small print...).
+    // The Settings screen shows them under "Site details", they are stored as
+    // `site.<field>` settings, and Settings::site() returns them. Null for none.
+    // See KIT-BLOCKS.md.
+    'site_schema' => env('CG_SITE_SCHEMA'),
+
     // The colours a Columns block's column may wear (its tint select).
     'block_tints' => ['workflow', 'agents', 'data', 'engineering'],
 
