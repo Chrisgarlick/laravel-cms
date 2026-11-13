@@ -16,8 +16,19 @@ interface Block {
  * is no reason to run anything inside the admin. The frame grows to its
  * content, and can be narrowed to phone width.
  */
-export function BlockPreviewFrame({ blocks, prefix, className }: { blocks: Block[]; prefix: string; className?: string }) {
-    const settled = useDebouncedValue(JSON.stringify(blocks), 400)
+export function BlockPreviewFrame({
+    blocks,
+    prefix,
+    fields = {},
+    className,
+}: {
+    blocks: Block[]
+    prefix: string
+    /** The entry's other simple values (a page's mode...), for the preview's document. */
+    fields?: Record<string, string | number | boolean>
+    className?: string
+}) {
+    const settled = useDebouncedValue(JSON.stringify({ blocks, fields }), 400)
     const [html, setHtml] = useState<string | null>(null)
     const [loading, setLoading] = useState(false)
     const [failed, setFailed] = useState(false)
@@ -33,7 +44,7 @@ export function BlockPreviewFrame({ blocks, prefix, className }: { blocks: Block
         fetch(`${prefix}/blocks/preview`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', Accept: 'text/html', 'X-CSRF-TOKEN': token },
-            body: JSON.stringify({ blocks: JSON.parse(settled) }),
+            body: settled,
             signal: controller.signal,
         })
             .then((response) => (response.ok ? response.text() : Promise.reject(new Error(String(response.status)))))

@@ -34,12 +34,16 @@ type BlockRow = Item & {
  * features and are the same problem, which is why neither has its own copy of
  * drag ordering or collapse state.
  */
-export default function BlocksField({ field, value, onChange, error }: FieldProps<StoredBlock[]>) {
+export default function BlocksField({ field, value, values, onChange, error }: FieldProps<StoredBlock[]>) {
     const allowed = field.allowedBlocks ?? []
     const { cms } = usePage<SharedProps>().props
     const [rows, setRows] = useState<BlockRow[]>(() => normalise(value))
     const [previewing, setPreviewing] = useState<Set<string>>(new Set())
     const [pagePreview, setPagePreview] = useState(false)
+
+    // The entry's other values (a page's mode, its title...), unsaved edits
+    // included, so the preview's document can dress itself as the page will.
+    const pageFields = previewFields(values, field.name)
 
     const togglePreview = (key: string) =>
         setPreviewing((current) => {
@@ -141,7 +145,7 @@ export default function BlocksField({ field, value, onChange, error }: FieldProp
                                 ))}
                             </div>
 
-                            {showing && <BlockPreviewFrame blocks={[{ type: row.type, data: row.data }]} prefix={cms.prefix} />}
+                            {showing && <BlockPreviewFrame blocks={[{ type: row.type, data: row.data }]} prefix={cms.prefix} fields={pageFields} />}
 
                             {!showing && fields.map((sub) => (
                                 <FieldRenderer
@@ -179,10 +183,29 @@ export default function BlocksField({ field, value, onChange, error }: FieldProp
             {error !== undefined && <p className="kit-field-error">{error}</p>}
 
             <Dialog open={pagePreview} onOpenChange={setPagePreview} title="Page preview" description="Every block, in order, as the site renders it. Unsaved changes included." className="[--_w:75rem] max-h-[min(100%-32px,56rem)]">
-                {pagePreview && <BlockPreviewFrame blocks={rows.map((row) => ({ type: row.type, data: row.data }))} prefix={cms.prefix} className="border-0" />}
+                {pagePreview && <BlockPreviewFrame blocks={rows.map((row) => ({ type: row.type, data: row.data }))} prefix={cms.prefix} fields={pageFields} className="border-0" />}
             </Dialog>
         </>
     )
+}
+
+/**
+ * The simple values among the entry's fields: strings, numbers and booleans.
+ * Rich text, relations, repeaters and the blocks themselves stay behind; the
+ * preview only needs what a layout reads off the page (its mode, its title).
+ */
+function previewFields(values: Record<string, unknown> | undefined, own: string): Record<string, string | number | boolean> {
+    const simple: Record<string, string | number | boolean> = {}
+
+    for (const [name, value] of Object.entries(values ?? {})) {
+        if (name === own || Object.keys(simple).length >= 50) continue
+
+        if (typeof value === 'number' || typeof value === 'boolean' || (typeof value === 'string' && value.length <= 500)) {
+            simple[name] = value
+        }
+    }
+
+    return simple
 }
 
 /**

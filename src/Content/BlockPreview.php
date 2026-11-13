@@ -54,8 +54,16 @@ final class BlockPreview
      * section's CSS onto `kit-styles`) is still there when the document's
      * head prints the stack. Rendered separately, Blade would flush the stacks
      * between the two and the preview would lose the section's CSS.
+     *
+     * $fields are the entry's other simple values (a page's mode, its title),
+     * unsaved edits included, given to the view as `$fields`, with the posted
+     * blocks as `$blocks`, so a site's preview document can dress itself the
+     * way its layout would (a theme's mode, a page class for some blocks).
+     *
+     * @param  array<int, mixed>  $blocks
+     * @param  array<string, string|int|float|bool|null>  $fields
      */
-    public function document(array $blocks): string
+    public function document(array $blocks, array $fields = []): string
     {
         $view = View::exists('cms.block-preview') ? 'cms.block-preview' : 'cgcms::block-preview';
         $factory = View::getFacadeRoot();
@@ -65,7 +73,7 @@ final class BlockPreview
         try {
             $body = $this->body($blocks);
 
-            return View::make($view, ['body' => $body])->render();
+            return View::make($view, ['body' => $body, 'fields' => $fields, 'blocks' => array_values($blocks)])->render();
         } finally {
             $factory->decrementRender();
             $factory->flushStateIfDoneRendering();
