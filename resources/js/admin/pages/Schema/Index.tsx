@@ -15,7 +15,7 @@ interface FieldInfo {
     help: string | null
     required: boolean
     maxLength: number | null
-    default: string | null
+    default: string | number | boolean | unknown[] | Record<string, unknown> | null
     options: string[]
     lint: string[]
     relatedCollection: string | null
@@ -418,11 +418,11 @@ function Rules({ field, onSelectBlock, onSelectGroup }: { field: FieldInfo; onSe
     if (field.maxLength) chips.push(<Chip key="max">max {field.maxLength}</Chip>)
     if (field.slugSource) chips.push(<Chip key="from">from {field.slugSource}</Chip>)
     if (field.options.length > 0) chips.push(<Chip key="opt">{field.options.map((o) => o || '(none)').join(' · ')}</Chip>)
-    if (field.default !== null && field.default !== '') chips.push(<Chip key="def">default {field.default}</Chip>)
+    if (field.default !== null && field.default !== '') chips.push(<Chip key="def">default {showDefault(field.default)}</Chip>)
     if (field.relatedCollection) chips.push(<Chip key="rel">→ {field.relatedCollection}{field.many ? ', many' : ''}</Chip>)
     if (field.requireAlt) chips.push(<Chip key="alt">alt text required</Chip>)
     if (field.preset) chips.push(<Chip key="pre">{field.preset} crop</Chip>)
-    if (field.min !== null || field.max !== null) chips.push(<Chip key="rows">{field.min ?? 0}–{field.max ?? '∞'} rows</Chip>)
+    if (field.min !== null || field.max !== null) chips.push(<Chip key="rows">{field.min ?? (field.type === 'number' ? '−∞' : 0)}–{field.max ?? '∞'}{field.type === 'number' ? '' : ' rows'}</Chip>)
     if (field.uses) chips.push(<Chip key="uses" onClick={onSelectGroup ? () => onSelectGroup(field.uses!) : undefined}>uses {field.uses}</Chip>)
     field.lint.forEach((rule) => chips.push(<Chip key={`lint-${rule}`}>{rule}</Chip>))
     field.blocks.forEach((handle) => chips.push(<Chip key={`b-${handle}`} onClick={onSelectBlock ? () => onSelectBlock(handle) : undefined}>{handle}</Chip>))
@@ -451,7 +451,7 @@ function toCode(field: FieldInfo, indent = ''): string {
     if (field.maxLength) parts.push(`->maxLength(${field.maxLength})`)
     if (field.slugSource) parts.push(`->from(${q(field.slugSource)})`)
     if (field.options.length > 0) parts.push(`->options([${field.options.map(q).join(', ')}])`)
-    if (field.default !== null) parts.push(`->default(${q(field.default)})`)
+    if (field.default !== null) parts.push(`->default(${typeof field.default === 'string' ? q(field.default) : phpLiteral(field.default)})`)
     if (field.relatedCollection) parts.push(`->to(${q(field.relatedCollection)})${field.many ? '->many()' : ''}`)
     if (field.requireAlt) parts.push('->requireAlt()')
     if (field.preset) parts.push(`->preset(${q(field.preset)})`)
@@ -480,3 +480,18 @@ function copy(text: string, message: string): void {
         .catch(() => toast('Could not copy to the clipboard', { tone: 'error' }))
 }
 
+
+/** A default as the Schema screen shows it: strings as they are, anything else as JSON. */
+function showDefault(value: NonNullable<FieldInfo['default']>): string {
+    return typeof value === 'string' ? value : JSON.stringify(value)
+}
+
+/** A non-string default as PHP source: numbers and booleans as they are, lists and maps as arrays. */
+function phpLiteral(value: unknown): string {
+    if (value === null) return 'null'
+    if (typeof value === 'string') return `'${value.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`
+    if (typeof value === 'number' || typeof value === 'boolean') return String(value)
+    if (Array.isArray(value)) return `[${value.map(phpLiteral).join(', ')}]`
+    if (typeof value === 'object') return `[${Object.entries(value as Record<string, unknown>).map(([k, v]) => `${phpLiteral(k)} => ${phpLiteral(v)}`).join(', ')}]`
+    return 'null'
+}

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import ItemList, { newKey, withKeys, withoutKeys, type Item } from '../components/ItemList'
+import { initialValues } from './defaults'
 import FieldRenderer, { isShown } from './FieldRenderer'
 import type { FieldProps, FieldSchema } from './types'
 
@@ -88,34 +89,7 @@ export default function RepeaterField({ field, value, onChange, error }: FieldPr
 
 /** A row with every subfield present, so no input starts uncontrolled. */
 export function blankRow(fields: FieldSchema[]): Record<string, unknown> {
-    const row: Record<string, unknown> = {}
-
-    for (const field of fields) {
-        row[field.name] = field.default ?? blankFor(field)
-    }
-
-    return row
-}
-
-function blankFor(field: FieldSchema): unknown {
-    switch (field.type) {
-        case 'boolean':
-            return false
-        case 'repeater':
-        case 'blocks':
-            return []
-        case 'group':
-            return {}
-        case 'relation':
-            return field.many ? [] : null
-        case 'number':
-        case 'datetime':
-        case 'media':
-        case 'richText':
-            return null
-        default:
-            return ''
-    }
+    return initialValues(fields)
 }
 
 /**

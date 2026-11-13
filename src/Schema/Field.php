@@ -29,7 +29,8 @@ final class Field
 
     private ?string $slugSource = null;
 
-    private ?string $default = null;
+    /** @var string|int|float|bool|array<array-key, mixed>|null */
+    private string|int|float|bool|array|null $default = null;
 
     /** @var array<int, string> */
     private array $options = [];
@@ -51,9 +52,9 @@ final class Field
     /** @var array<int, self> Subfields, for a repeater. */
     private array $subFields = [];
 
-    private ?int $min = null;
+    private int|float|null $min = null;
 
-    private ?int $max = null;
+    private int|float|null $max = null;
 
     private ?string $rowLabel = null;
 
@@ -347,7 +348,18 @@ final class Field
         return $this;
     }
 
-    public function default(string $value): self
+    /**
+     * The value a new entry, block or row starts with.
+     *
+     * Any JSON-shaped value: a string for text, a number for a number field,
+     * true or false for a boolean, a list of rows for a repeater. The value is
+     * cast to the field's type when read (defaultValue()), so a number field
+     * given '3' still starts at the number 3 and a boolean given '1' at true:
+     * the admin seeds the form with the right JavaScript types either way.
+     *
+     * @param  string|int|float|bool|array<array-key, mixed>|null  $value
+     */
+    public function default(string|int|float|bool|array|null $value): self
     {
         $this->default = $value;
 
@@ -430,17 +442,20 @@ final class Field
         return $this->subFields;
     }
 
-    /** Repeater: how many rows are allowed. */
-    public function min(int $rows): self
+    /**
+     * Repeater: the fewest rows allowed. Number: the smallest value allowed.
+     */
+    public function min(int|float $value): self
     {
-        $this->min = $rows;
+        $this->min = $value;
 
         return $this;
     }
 
-    public function max(int $rows): self
+    /** Repeater: the most rows allowed. Number: the largest value allowed. */
+    public function max(int|float $value): self
     {
-        $this->max = $rows;
+        $this->max = $value;
 
         return $this;
     }
@@ -466,12 +481,23 @@ final class Field
 
     public function minRows(): ?int
     {
-        return $this->min;
+        return $this->type === 'repeater' && $this->min !== null ? (int) $this->min : null;
     }
 
     public function maxRows(): ?int
     {
-        return $this->max;
+        return $this->type === 'repeater' && $this->max !== null ? (int) $this->max : null;
+    }
+
+    /** Number: the range allowed, either end open when null. */
+    public function minValue(): int|float|null
+    {
+        return $this->type === 'number' ? $this->min : null;
+    }
+
+    public function maxValue(): int|float|null
+    {
+        return $this->type === 'number' ? $this->max : null;
     }
 
     /** @param array<int, string> $rules */
@@ -492,9 +518,33 @@ final class Field
         return $this->slugSource;
     }
 
-    public function defaultValue(): ?string
+    /**
+     * The default, cast to what this field stores.
+     *
+     * A number is a number, a boolean a boolean, a select or text a string; a
+     * repeater's or group's default is used as given. A value that cannot be
+     * cast (a word for a number field) is no default at all, rather than a
+     * value the field's own validation would reject.
+     *
+     * @return string|int|float|bool|array<array-key, mixed>|null
+     */
+    public function defaultValue(): string|int|float|bool|array|null
     {
-        return $this->default;
+        $value = $this->default;
+
+        if ($value === null) {
+            return null;
+        }
+
+        return match ($this->type) {
+            'number' => is_numeric($value) && ! is_bool($value) ? $value + 0 : null,
+            'boolean' => is_string($value)
+                ? in_array(strtolower(trim($value)), ['1', 'true', 'yes', 'on'], true)
+                : (is_array($value) ? null : (bool) $value),
+            'repeater', 'blocks', 'group', 'media', 'richText', 'seo' => is_array($value) ? $value : null,
+            'relation' => $this->many ? (is_array($value) ? array_values($value) : null) : (is_scalar($value) ? (string) $value : null),
+            default => is_array($value) ? null : (is_bool($value) ? ($value ? '1' : '') : (string) $value),
+        };
     }
 
     /** @return array<int, string> */
@@ -573,6 +623,16 @@ final class Field
 
         if ($this->type === 'select' && $this->options !== []) {
             $rules[] = 'in:'.implode(',', $this->options);
+        }
+
+        if ($this->type === 'number') {
+            if ($this->min !== null) {
+                $rules[] = 'min:'.$this->min;
+            }
+
+            if ($this->max !== null) {
+                $rules[] = 'max:'.$this->max;
+            }
         }
 
         if ($this->type === 'repeater') {
@@ -702,7 +762,9 @@ final class Field
             'nullable' => $this->nullable,
             'maxLength' => $this->maxLength,
             'slugSource' => $this->slugSource,
-            'default' => $this->default,
+            // Cast to the field's type, so the admin seeds a number field with
+            // a number and a toggle with true or false, not '1'.
+            'default' => $this->defaultValue(),
             'options' => $this->options,
             'lint' => $this->lintRules,
             'relatedCollection' => $this->relatedCollection,

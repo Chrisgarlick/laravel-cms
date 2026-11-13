@@ -7,6 +7,8 @@ export default function NumberField({ field, value, onChange }: FieldProps<numbe
             type="number"
             className="kit-input max-w-xs"
             value={value ?? ''}
+            min={field.min ?? undefined}
+            max={field.max ?? undefined}
             required={field.required}
             onChange={(event) => {
                 // An empty input is null, not zero. Sending zero would make

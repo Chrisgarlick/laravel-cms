@@ -16,7 +16,8 @@ export interface FieldSchema {
     nullable: boolean
     maxLength: number | null
     slugSource: string | null
-    default: string | null
+    /** Cast to the field's type by the server: a number, a boolean, a list of rows... */
+    default: string | number | boolean | unknown[] | Record<string, unknown> | null
     options: string[]
     lint: string[]
     relatedCollection: string | null
@@ -27,7 +28,7 @@ export interface FieldSchema {
     /** Blocks: the layouts this field allows, each with its own field schema. */
     allowedBlocks: Array<{ handle: string; label: string; fields: FieldSchema[] }>
 
-    /** Repeater: the fields each row holds, and how many rows are allowed. */
+    /** Repeater: the fields each row holds, and how many rows are allowed. Number: the range allowed. */
     fields?: FieldSchema[]
     min?: number | null
     max?: number | null

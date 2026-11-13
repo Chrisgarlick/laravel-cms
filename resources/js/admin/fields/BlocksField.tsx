@@ -5,6 +5,7 @@ import { BlockPreviewFrame } from '../components/BlockPreviewFrame'
 import ItemList, { newKey, withoutKeys, type Item } from '../components/ItemList'
 import { Dialog } from '../components/ui'
 import type { SharedProps } from '../types'
+import { initialValues } from './defaults'
 import FieldRenderer from './FieldRenderer'
 import type { FieldProps, FieldSchema } from './types'
 
@@ -212,25 +213,7 @@ function normalise(value: unknown): BlockRow[] {
 }
 
 function blankData(fields: FieldSchema[]): Record<string, unknown> {
-    const data: Record<string, unknown> = {}
-
-    for (const field of fields) {
-        data[field.name] =
-            field.default ??
-            (field.type === 'boolean'
-                ? false
-                : field.type === 'repeater' || field.type === 'blocks'
-                  ? []
-                  : field.type === 'relation'
-                    ? field.many
-                        ? []
-                        : null
-                    : ['number', 'datetime', 'media', 'richText'].includes(field.type)
-                      ? null
-                      : '')
-    }
-
-    return data
+    return initialValues(fields)
 }
 
 /** The first bit of text in the block, so a collapsed row is identifiable. */
