@@ -87,6 +87,11 @@ final class HtmlInspector
 
     /**
      * Every image, with its alt attribute. Null means the attribute is absent.
+     * An image explicitly hidden from assistive technology (aria-hidden="true",
+     * or role presentation or none) is decorative by declaration, a logo beside
+     * the name it spells, so it isn't listed: there is nothing to describe. An
+     * empty alt alone is still listed, as a rich text image left undescribed
+     * renders that way.
      *
      * @return array<int, array{src: string, alt: string|null}>
      */
@@ -95,6 +100,12 @@ final class HtmlInspector
         $images = [];
 
         foreach ($this->scoped('.//img') as $node) {
+            $role = strtolower(trim($node->getAttribute('role')));
+
+            if (strtolower(trim($node->getAttribute('aria-hidden'))) === 'true' || $role === 'presentation' || $role === 'none') {
+                continue;
+            }
+
             $images[] = [
                 'src' => $node->getAttribute('src'),
                 'alt' => $node->hasAttribute('alt') ? trim($node->getAttribute('alt')) : null,
