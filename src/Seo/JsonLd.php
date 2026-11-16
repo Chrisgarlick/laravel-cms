@@ -132,12 +132,40 @@ final class JsonLd
             '@id' => $ids['organization'],
             'name' => $organization['name'] ?? $this->site['name'] ?? null,
             'url' => $domain.'/',
+            'description' => $organization['description'] ?? $this->site['description'] ?? null,
             'logo' => isset($organization['logo'])
                 ? ['@type' => 'ImageObject', 'url' => $this->absolute((string) $organization['logo'])]
                 : null,
             'email' => $this->site['contact_email'] ?? null,
+            'contactPoint' => $this->contactPoint($organization),
             'sameAs' => $this->sameAs($organization['same_as'] ?? null),
         ], fn (mixed $value): bool => $value !== null && $value !== []);
+    }
+
+    /**
+     * How to get in touch: the contact email and the contact page. Null when
+     * the site has neither, so there is no empty node.
+     *
+     * @param  array<string, mixed>  $organization
+     * @return array<string, string>|null
+     */
+    private function contactPoint(array $organization): ?array
+    {
+        $email = $this->site['contact_email'] ?? null;
+        $url = $organization['contact_url'] ?? null;
+
+        if (! filled($email) && ! filled($url)) {
+            return null;
+        }
+
+        return array_filter([
+            '@type' => 'ContactPoint',
+            'contactType' => 'customer service',
+            'email' => filled($email) ? (string) $email : null,
+            'url' => filled($url) ? $this->absolute((string) $url) : null,
+            'areaServed' => $this->site['area_served'] ?? null,
+            'availableLanguage' => 'English',
+        ], fn (mixed $value): bool => $value !== null);
     }
 
     /**
@@ -154,6 +182,7 @@ final class JsonLd
             'name' => $person['name'] ?? $this->site['name'] ?? null,
             'url' => $domain.'/',
             'jobTitle' => $person['job_title'] ?? null,
+            'image' => filled($person['image'] ?? null) ? $this->absolute((string) $person['image']) : null,
             'worksFor' => ['@id' => $ids['organization']],
             'sameAs' => $this->sameAs($person['same_as'] ?? null),
         ], fn (mixed $value): bool => $value !== null && $value !== []);

@@ -179,6 +179,9 @@ return [
         'person' => [
             'name' => env('CG_SEO_PERSON_NAME', 'Chris Garlick'),
             'job_title' => env('CG_SEO_PERSON_TITLE'),
+            // A photo of the person, a path or URL (relative paths resolve
+            // against site.domain).
+            'image' => env('CG_SEO_PERSON_IMAGE'),
             'same_as' => array_values(array_filter([
                 env('CG_SEO_LINKEDIN'),
                 env('CG_SEO_GITHUB'),
@@ -188,6 +191,10 @@ return [
         'organization' => [
             'name' => env('CG_SEO_ORG_NAME'),
             'logo' => env('CG_SEO_ORG_LOGO'),
+            // Falls back to seo.description.
+            'description' => env('CG_SEO_ORG_DESCRIPTION'),
+            // The contact page, for the ContactPoint beside site.contact_email.
+            'contact_url' => env('CG_SEO_CONTACT_URL'),
             'same_as' => array_values(array_filter([
                 env('CG_SEO_LINKEDIN'),
             ])),
