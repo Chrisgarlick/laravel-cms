@@ -108,6 +108,28 @@ final class MediaResolver
             $sources['image/'.$format] = $media->url($preset, $format);
         }
 
+        // Each format's smaller widths, then the preset's own, as a srcset.
+        // A width the original can't fill is left out (no upscaling), and
+        // with nothing smaller than the full size there is no srcset at all.
+        $srcsets = [];
+
+        foreach ($this->library->formatsFor($media) as $format) {
+            $candidates = [];
+
+            foreach ($this->library->widths($preset) as $width) {
+                $smaller = CropGeometry::output($media->width, $media->height, $width, null);
+
+                if ($smaller['width'] < $size['width']) {
+                    $candidates[$smaller['width']] = $media->url($preset.'-'.$width.'w', $format).' '.$smaller['width'].'w';
+                }
+            }
+
+            if ($candidates !== []) {
+                $candidates[$size['width']] = $media->url($preset, $format).' '.$size['width'].'w';
+                $srcsets[$format] = implode(', ', $candidates);
+            }
+        }
+
         return new ResolvedImage(
             src: $media->url($preset),
 
@@ -118,6 +140,7 @@ final class MediaResolver
             width: $size['width'],
             height: $size['height'],
             sources: $sources,
+            srcsets: $srcsets,
         );
     }
 }

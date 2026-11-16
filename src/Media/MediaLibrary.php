@@ -61,10 +61,53 @@ final class MediaLibrary
         return $presets;
     }
 
-    /** @return array{width: int, height: int|null}|null */
+    /**
+     * A preset by name, or one of its smaller widths: `hero-800w` is `hero`
+     * at 800px wide, when `hero` lists 800 in its `widths`. Those are made on
+     * first request, not on upload, so a srcset costs nothing until a browser
+     * asks for it.
+     *
+     * @return array{width: int, height: int|null}|null
+     */
     public function preset(string $name): ?array
     {
-        return $this->presets()[$name] ?? null;
+        $presets = $this->presets();
+
+        if (isset($presets[$name])) {
+            return $presets[$name];
+        }
+
+        if (preg_match('/^([a-z0-9-]+)-(\d+)w$/', $name, $m) === 1 && in_array((int) $m[2], $this->widths($m[1]), true)) {
+            return ['width' => (int) $m[2], 'height' => null];
+        }
+
+        return null;
+    }
+
+    /**
+     * The smaller widths a preset is also made in, for srcset: from its
+     * `widths`, narrowest first, each less than the preset's own width. Only a
+     * width-only preset (null height) has any, as a crop at another width
+     * would be a different picture.
+     *
+     * @return array<int, int>
+     */
+    public function widths(string $preset): array
+    {
+        $definition = (array) ($this->config['presets'][$preset] ?? []);
+        $width = (int) ($definition['width'] ?? 0);
+
+        if ($width === 0 || isset($definition['height'])) {
+            return [];
+        }
+
+        $widths = array_values(array_unique(array_filter(
+            array_map('intval', (array) ($definition['widths'] ?? [])),
+            fn (int $w): bool => $w > 0 && $w < $width,
+        )));
+        sort($widths);
+
+        return $widths;
     }
 
     /**

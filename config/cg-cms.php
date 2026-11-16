@@ -367,16 +367,18 @@ return [
             'card' => ['width' => 600, 'height' => 400],
             'og' => ['width' => 1200, 'height' => 630],
             'thumb' => ['width' => 200, 'height' => 200],
-            'full' => ['width' => 1600, 'height' => null],
+            // `widths`: smaller sizes a width-only preset is also made in,
+            // for srcset (made on first request, see MediaLibrary::preset).
+            'full' => ['width' => 1600, 'height' => null, 'widths' => [800, 1200]],
 
             // Named as kit's sections name their images (a schema's `sizes`),
             // so a kit block's image comes in a variant of its own size. Width
             // only: each section crops with CSS (aspect-ratio and object-fit)
             // and its variants crop differently, so a fixed crop here would
             // be cropped twice. Kit's `card` images use `card` above.
-            'hero' => ['width' => 1600, 'height' => null],
-            'half' => ['width' => 1200, 'height' => null],
-            'product' => ['width' => 1200, 'height' => null],
+            'hero' => ['width' => 1600, 'height' => null, 'widths' => [800, 1200]],
+            'half' => ['width' => 1200, 'height' => null, 'widths' => [600, 900]],
+            'product' => ['width' => 1200, 'height' => null, 'widths' => [600, 900]],
         ],
     ],
 
