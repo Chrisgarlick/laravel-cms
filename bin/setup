@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# Gets a fresh clone ready to work on: the composer packages (Pest, Pint,
+# PHPStan, Testbench) and the admin's npm packages. dist/ is committed, so
+# nothing is built. Safe to run again.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+need() { command -v "$1" >/dev/null 2>&1 || { echo "bin/setup: $1 isn't installed. $2" >&2; exit 1; }; }
+need php "Install Herd (https://herd.laravel.com), or brew install php"
+need composer "It comes with Herd, or brew install composer"
+need node "Install Node.js (Herd's, or brew install node)"
+need npm "It comes with Node.js"
+php -r 'exit(PHP_VERSION_ID >= 80300 ? 0 : 1);' || { echo "bin/setup: cg-cms needs PHP 8.3+ (this is $(php -r 'echo PHP_VERSION;'))" >&2; exit 1; }
+
+composer install --no-interaction
+
+# npm ci starts from nothing, so only when the lockfile has changed since.
+if [ node_modules/.package-lock.json -nt package-lock.json ]; then
+  echo "node_modules is up to date"
+else
+  npm ci --no-audit --no-fund
+fi
+
+echo
+echo "Ready. npm run dev for the admin (HMR on :5174); ~/Herd/portfolio/bin/link-cms runs the site on this copy."
