@@ -18,17 +18,15 @@ rebuild service.
 
 ## Status
 
-Phase 3, step 3 of 6. Built: storage, render-on-save, page cache with precise invalidation,
-blocks, revisions, redirects with slug history, forms with a stateless signed token, the SEO
-module (meta, JSON-LD, sitemap, robots.txt, llms.txt, RSS), brand-voice lint, Cloudflare
-purging, the admin's Inertia boundary, the field registry and entry editor, and the block
-canvas with repeaters.
+In production on chrisgarlick.com. The package core, the page cache, SEO and redirects, and the
+whole admin are built: entry editor, block canvas, collection index, media library,
+redirects, submissions, settings, dashboard, and the SEO checks and audit.
 
-Not built yet: the collection index proper, the media library, roles, and the media pipeline
-behind `media` fields.
+Not built yet: roles and TOTP two-factor sign-in (section 5.11 of the plan). Any account that
+can sign in to the admin can do everything in it.
 
-The Phase 0 benchmark gate is still open: the numbers in the build log are from a laptop, and
-the plan requires them from a 1GB LON1 droplet with the nginx `try_files` rule in place.
+The build log's benchmark numbers are from a laptop. The Phase 0 gate asks for them from the
+1GB LON1 droplet with the nginx `try_files` rule in place.
 
 ## Requirements
 
